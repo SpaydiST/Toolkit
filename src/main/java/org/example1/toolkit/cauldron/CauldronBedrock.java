@@ -36,7 +36,7 @@ public final class CauldronBedrock {
     private static final int DEFAULT_LEATHER_R = 102;
     private static final int DEFAULT_LEATHER_G = 76;
     private static final int DEFAULT_LEATHER_B = 56;
-    private static final int CMD_CAULDRON_WATER = 1003;
+    private static final NamespacedKey ITEM_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_water");
 
     private static JavaPlugin plugin;
 
@@ -129,10 +129,7 @@ public final class CauldronBedrock {
             ItemStack fluidItem = new ItemStack(Material.LEATHER_HORSE_ARMOR);
             LeatherArmorMeta meta = (LeatherArmorMeta) fluidItem.getItemMeta();
             meta.setColor(color);
-            org.bukkit.inventory.meta.components.CustomModelDataComponent cmd =
-                    meta.getCustomModelDataComponent();
-            cmd.setFloats(List.of((float) CMD_CAULDRON_WATER));
-            meta.setCustomModelDataComponent(cmd);
+            meta.setItemModel(ITEM_MODEL_KEY);
             fluidItem.setItemMeta(meta);
 
             ent.setItemStack(fluidItem);
