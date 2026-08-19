@@ -1,0 +1,15 @@
+{
+  "textures": {
+    "particle": "minecraft:item/cauldron_water"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 0.01, 16],
+      "faces": {
+        "up":   { "texture": "minecraft:item/cauldron_water", "tintindex": 0, "cullface": "up" },
+        "down": { "texture": "minecraft:item/cauldron_water", "tintindex": 0 }
+      }
+    }
+  ]
+}
