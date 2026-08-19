@@ -1,0 +1,41 @@
+# Политика дебагстика.
+# whitelist: true  — можно менять только то, что перечислено в allowed (forbidden дополнительно запрещает)
+# whitelist: false — можно менять всё, кроме forbidden
+#
+# В записях блоков/тегов:
+#   - без "properties" — разрешены/запрещены все свойства блока
+#   - "properties" с "all" — свойство можно листать по всем значениям
+#   - "properties" со списком — свойство листается только по указанным значениям
+# Теги: обычные (stairs, walls, fences...) и c: (например c:glass_panes)
+allowed:
+  tags:
+    - id: stairs
+    - id: walls
+    - id: glass_panes
+    - id: fences
+  blocks:
+    - id: iron_bars
+    - id: glass_pane
+    - id: white_stained_glass_pane
+    - id: orange_stained_glass_pane
+    - id: magenta_stained_glass_pane
+    - id: light_blue_stained_glass_pane
+    - id: yellow_stained_glass_pane
+    - id: lime_stained_glass_pane
+    - id: pink_stained_glass_pane
+    - id: gray_stained_glass_pane
+    - id: light_gray_stained_glass_pane
+    - id: cyan_stained_glass_pane
+    - id: purple_stained_glass_pane
+    - id: blue_stained_glass_pane
+    - id: brown_stained_glass_pane
+    - id: green_stained_glass_pane
+    - id: red_stained_glass_pane
+    - id: black_stained_glass_pane
+forbidden:
+  blocks: []
+  properties:
+    waterlogged:
+      - all
+  tags: []
+whitelist: true

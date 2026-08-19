@@ -1,0 +1,20 @@
+name: Toolkit
+version: '1-0'
+main: org.example1.toolkit.Toolkit
+api-version: '26.2'
+load: POSTWORLD
+dependencies:
+  server:
+    TimeSpeed-plugin:
+      load: AFTER
+      required: false
+    packetevents:
+      load: BEFORE
+      required: false
+    LibsDisguises:
+      required: false
+defaultPerm: op
+permissions:
+  toolkit.reload:
+    description: Перезагрузка конфигурации Toolkit
+    default: op
