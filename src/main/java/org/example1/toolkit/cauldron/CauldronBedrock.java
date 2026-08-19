@@ -1,7 +1,5 @@
 package org.example1.toolkit.cauldron;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -11,7 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.Chunk;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Display;
-import org.bukkit.entity.TextDisplay;
+import org.bukkit.entity.ItemDisplay;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -34,10 +32,11 @@ public final class CauldronBedrock {
 
     private static final Map<String, DyeColor> cauldronDyeColors = new HashMap<>();
     private static final Map<String, PotionData> cauldronPotions = new HashMap<>();
-    private static final Map<String, TextDisplay> cauldronDisplays = new HashMap<>();
+    private static final Map<String, ItemDisplay> cauldronDisplays = new HashMap<>();
     private static final int DEFAULT_LEATHER_R = 102;
     private static final int DEFAULT_LEATHER_G = 76;
     private static final int DEFAULT_LEATHER_B = 56;
+    private static final int CMD_CAULDRON_WATER = 1003;
 
     private static JavaPlugin plugin;
 
@@ -133,7 +132,7 @@ public final class CauldronBedrock {
         }
         String k = key(block.getLocation());
 
-        TextDisplay existing = cauldronDisplays.get(k);
+        ItemDisplay existing = cauldronDisplays.get(k);
         if (existing != null && existing.isValid()) {
             existing.remove();
         }
@@ -141,30 +140,33 @@ public final class CauldronBedrock {
         double waterY = waterLevelY(level);
         Location loc = block.getLocation().add(0.5, waterY, 0.5);
 
-        TextDisplay display = block.getWorld().spawn(loc, TextDisplay.class);
-        TextColor textColor = TextColor.color(color.getRed(), color.getGreen(), color.getBlue());
-        display.text(Component.text("\u25a0").color(textColor));
-        display.setBackgroundColor(Color.fromARGB(0, 0, 0, 0));
-        display.setBillboard(Display.Billboard.FIXED);
-        display.setPersistent(false);
-        display.setShadowed(false);
-        display.setViewRange(1.0f);
-        display.setSeeThrough(false);
-        display.setDefaultBackground(false);
-        display.setTextOpacity((byte) -1);
+        ItemDisplay display = block.getWorld().spawn(loc, ItemDisplay.class, ent -> {
+            ItemStack fluidItem = new ItemStack(Material.LEATHER_HORSE_ARMOR);
+            LeatherArmorMeta meta = (LeatherArmorMeta) fluidItem.getItemMeta();
+            meta.setColor(color);
+            meta.setCustomModelData(CMD_CAULDRON_WATER);
+            fluidItem.setItemMeta(meta);
 
-        float s = 4.2f;
-        Matrix4f transform = new Matrix4f();
-        transform.scale(s, s, 1.0f);
-        transform.rotateX((float) Math.toRadians(-90));
-        display.setTransformationMatrix(transform);
+            ent.setItemStack(fluidItem);
+            ent.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.NONE);
+
+            ent.setPersistent(false);
+            ent.setViewRange(1.0f);
+            ent.setShadowRadius(0f);
+            ent.setShadowStrength(0f);
+
+            Matrix4f transform = new Matrix4f();
+            transform.translate(-0.375f, 0f, -0.375f);
+            transform.scale(0.75f, 1.0f, 0.75f);
+            ent.setTransformationMatrix(transform);
+        });
 
         cauldronDisplays.put(k, display);
     }
 
     public static void removeDisplay(Block block) {
         String k = key(block.getLocation());
-        TextDisplay display = cauldronDisplays.remove(k);
+        ItemDisplay display = cauldronDisplays.remove(k);
         if (display != null && display.isValid()) {
             display.remove();
         }
@@ -172,7 +174,7 @@ public final class CauldronBedrock {
 
     public static void updateDisplayLevel(Block block, int newLevel) {
         String k = key(block.getLocation());
-        TextDisplay display = cauldronDisplays.get(k);
+        ItemDisplay display = cauldronDisplays.get(k);
         if (display == null || !display.isValid()) {
             cauldronDisplays.remove(k);
             if (newLevel > 0) {
@@ -192,7 +194,7 @@ public final class CauldronBedrock {
     }
 
     public static void removeAllDisplays() {
-        for (TextDisplay display : cauldronDisplays.values()) {
+        for (ItemDisplay display : cauldronDisplays.values()) {
             if (display != null && display.isValid()) display.remove();
         }
         cauldronDisplays.clear();
@@ -296,7 +298,7 @@ public final class CauldronBedrock {
 
     private static void ensureDisplay(Block block, Color color) {
         String k = key(block.getLocation());
-        TextDisplay display = cauldronDisplays.get(k);
+        ItemDisplay display = cauldronDisplays.get(k);
         if (display == null || !display.isValid()) {
             int level = getWaterLevel(block);
             spawnColoredDisplay(block, color, level);
