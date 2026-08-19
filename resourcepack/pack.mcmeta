@@ -1,6 +1,7 @@
 {
     "pack": {
-        "pack_format": 88,
-        "description": "Toolkit plugin - custom item textures & colored cauldron water"
+        "description": "Toolkit plugin - custom item textures & colored cauldron water",
+        "min_format": [88, 0],
+        "max_format": [88, 0]
     }
 }

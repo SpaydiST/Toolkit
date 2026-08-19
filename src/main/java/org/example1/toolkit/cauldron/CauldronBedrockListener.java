@@ -93,24 +93,24 @@ public final class CauldronBedrockListener implements Listener {
 
         event.setCancelled(true);
 
-        DyeColor existing = CauldronBedrock.getDyeColor(block);
-        DyeColor result = existing == null ? dye : CauldronBedrock.mixColors(existing, dye);
+        Color existing = CauldronBedrock.getDyeColor(block);
+        Color newColor = existing == null ? dye.getColor() : CauldronBedrock.mixColors(existing, dye.getColor());
 
-        CauldronBedrock.setDyeColor(block, result);
+        CauldronBedrock.setDyeColor(block, newColor);
         CauldronBedrock.setPotion(block, null);
 
-        CauldronBedrock.spawnColoredDisplay(block, result.getColor(), level);
+        CauldronBedrock.spawnColoredDisplay(block, newColor, level);
 
         if (player.getGameMode() != GameMode.CREATIVE) {
             item.setAmount(item.getAmount() - 1);
         }
 
         player.sendActionBar(Component.text("Краска добавлена в котёл", NamedTextColor.AQUA));
-        spawnDust(block, result.getColor());
+        spawnDust(block, newColor);
     }
 
     private void handleLeatherArmor(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
-        DyeColor dyeColor = CauldronBedrock.getDyeColor(block);
+        Color dyeColor = CauldronBedrock.getDyeColor(block);
         CauldronBedrock.PotionData potionData = CauldronBedrock.getPotion(block);
 
         if (dyeColor != null) {

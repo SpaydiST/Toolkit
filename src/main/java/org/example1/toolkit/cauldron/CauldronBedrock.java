@@ -30,7 +30,7 @@ import java.util.Map;
 
 public final class CauldronBedrock {
 
-    private static final Map<String, DyeColor> cauldronDyeColors = new HashMap<>();
+    private static final Map<String, Color> cauldronDyeColors = new HashMap<>();
     private static final Map<String, PotionData> cauldronPotions = new HashMap<>();
     private static final Map<String, ItemDisplay> cauldronDisplays = new HashMap<>();
     private static final int DEFAULT_LEATHER_R = 102;
@@ -52,15 +52,15 @@ public final class CauldronBedrock {
         return loc.getWorld().getName() + ":" + loc.getBlockX() + ":" + loc.getBlockY() + ":" + loc.getBlockZ();
     }
 
-    public static DyeColor getDyeColor(Block block) {
+    public static Color getDyeColor(Block block) {
         return cauldronDyeColors.get(key(block.getLocation()));
     }
 
-    public static void setDyeColor(Block block, DyeColor color) {
+    public static void setDyeColor(Block block, Color color) {
         String k = key(block.getLocation());
         if (color != null) {
             cauldronDyeColors.put(k, color);
-            saveDyePDC(block, color.getColor().asRGB());
+            saveDyePDC(block, color.asRGB());
         } else {
             cauldronDyeColors.remove(k);
             clearDyePDC(block);
@@ -91,26 +91,11 @@ public final class CauldronBedrock {
         removeDisplay(block);
     }
 
-    public static DyeColor mixColors(DyeColor existing, DyeColor add) {
-        int r1 = existing.getColor().getRed(), g1 = existing.getColor().getGreen(), b1 = existing.getColor().getBlue();
-        int r2 = add.getColor().getRed(), g2 = add.getColor().getGreen(), b2 = add.getColor().getBlue();
-        int r = (r1 + r2) / 2, g = (g1 + g2) / 2, b = (b1 + b2) / 2;
-        Color mixed = Color.fromRGB(r, g, b);
-        for (DyeColor dc : DyeColor.values()) {
-            if (dc.getColor().equals(mixed)) return dc;
-        }
-        return closestDye(r, g, b);
-    }
-
-    private static DyeColor closestDye(int r, int g, int b) {
-        DyeColor best = DyeColor.WHITE;
-        double bestDist = Double.MAX_VALUE;
-        for (DyeColor dc : DyeColor.values()) {
-            Color c = dc.getColor();
-            double dist = Math.pow(r - c.getRed(), 2) + Math.pow(g - c.getGreen(), 2) + Math.pow(b - c.getBlue(), 2);
-            if (dist < bestDist) { bestDist = dist; best = dc; }
-        }
-        return best;
+    public static Color mixColors(Color existing, Color add) {
+        int r = (existing.getRed() + add.getRed()) / 2;
+        int g = (existing.getGreen() + add.getGreen()) / 2;
+        int b = (existing.getBlue() + add.getBlue()) / 2;
+        return Color.fromRGB(r, g, b);
     }
 
     public static int getWaterLevel(Block block) {
@@ -178,9 +163,9 @@ public final class CauldronBedrock {
         if (display == null || !display.isValid()) {
             cauldronDisplays.remove(k);
             if (newLevel > 0) {
-                DyeColor dye = cauldronDyeColors.get(k);
+                Color dye = cauldronDyeColors.get(k);
                 PotionData pot = cauldronPotions.get(k);
-                Color color = dye != null ? dye.getColor() : (pot != null ? potionColor(pot.type()) : null);
+                Color color = dye != null ? dye : (pot != null ? potionColor(pot.type()) : null);
                 if (color != null) spawnColoredDisplay(block, color, newLevel);
             }
             return;
@@ -221,8 +206,7 @@ public final class CauldronBedrock {
                             if (rgb == null) continue;
                             Color color = Color.fromRGB(rgb);
                             int level = getWaterLevel(block);
-                            DyeColor dye = closestDye(color.getRed(), color.getGreen(), color.getBlue());
-                            cauldronDyeColors.put(key(block.getLocation()), dye);
+                            cauldronDyeColors.put(key(block.getLocation()), color);
                             spawnColoredDisplay(block, color, level);
                         } catch (NumberFormatException ignored) {}
                     } else if (keyStr.startsWith("pot_")) {
@@ -274,8 +258,8 @@ public final class CauldronBedrock {
                         removeDisplay(block);
                         continue;
                     }
-                    spawnColoredParticles(block, entry.getValue().getColor());
-                    ensureDisplay(block, entry.getValue().getColor());
+                    spawnColoredParticles(block, entry.getValue());
+                    ensureDisplay(block, entry.getValue());
                 }
                 var piter = cauldronPotions.entrySet().iterator();
                 while (piter.hasNext()) {
@@ -406,9 +390,9 @@ public final class CauldronBedrock {
         return c.getRed() == DEFAULT_LEATHER_R && c.getGreen() == DEFAULT_LEATHER_G && c.getBlue() == DEFAULT_LEATHER_B;
     }
 
-    public static void applyDyeToArmor(ItemStack item, DyeColor color) {
+    public static void applyDyeToArmor(ItemStack item, Color color) {
         if (item.getItemMeta() instanceof LeatherArmorMeta meta) {
-            meta.setColor(color.getColor());
+            meta.setColor(color);
             item.setItemMeta(meta);
         }
     }
