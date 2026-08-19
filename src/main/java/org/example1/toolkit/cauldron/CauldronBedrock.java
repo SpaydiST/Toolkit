@@ -129,7 +129,10 @@ public final class CauldronBedrock {
             ItemStack fluidItem = new ItemStack(Material.LEATHER_HORSE_ARMOR);
             LeatherArmorMeta meta = (LeatherArmorMeta) fluidItem.getItemMeta();
             meta.setColor(color);
-            meta.setCustomModelData(CMD_CAULDRON_WATER);
+            org.bukkit.inventory.meta.components.CustomModelDataComponent cmd =
+                    meta.getCustomModelDataComponent();
+            cmd.setFloats(List.of((float) CMD_CAULDRON_WATER));
+            meta.setCustomModelDataComponent(cmd);
             fluidItem.setItemMeta(meta);
 
             ent.setItemStack(fluidItem);
