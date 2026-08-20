@@ -37,6 +37,7 @@ public final class CauldronBedrock {
     private static final int DEFAULT_LEATHER_G = 76;
     private static final int DEFAULT_LEATHER_B = 56;
     private static final NamespacedKey ITEM_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_water");
+    private static final NamespacedKey POTION_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_potion");
 
     private static JavaPlugin plugin;
 
@@ -129,6 +130,9 @@ public final class CauldronBedrock {
             existing.remove();
         }
 
+        boolean isPotion = cauldronPotions.containsKey(k);
+        NamespacedKey modelKey = isPotion ? POTION_MODEL_KEY : ITEM_MODEL_KEY;
+
         double waterY = waterLevelY(level);
         Location loc = block.getLocation().add(0.5, waterY + 0.005, 0.5);
 
@@ -136,7 +140,7 @@ public final class CauldronBedrock {
             ItemStack fluidItem = new ItemStack(Material.POTION);
             PotionMeta meta = (PotionMeta) fluidItem.getItemMeta();
             meta.setColor(color);
-            meta.setItemModel(ITEM_MODEL_KEY);
+            meta.setItemModel(modelKey);
             fluidItem.setItemMeta(meta);
 
             ent.setItemStack(fluidItem);
