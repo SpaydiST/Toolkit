@@ -64,7 +64,8 @@ public final class DebugStickListener implements Listener {
             }
         } else {
             if (player.isSneaking() && DebugStick.hasCopiedState(item)
-                    && block.getType().name().equals(DebugStick.getCopiedType(item))) {
+                    && block.getType().name().equals(DebugStick.getCopiedType(item))
+                    && policy.isPasteEnabled()) {
                 applyState(player, block, item);
             } else {
                 if (modifyValue(player, block, forward)) {

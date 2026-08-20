@@ -35,6 +35,7 @@ public final class EditPolicy {
     }
 
     private final boolean whitelist;
+    private final boolean paste;
     private final List<Entry> allowedBlocks = new ArrayList<>();
     private final List<Entry> allowedTags = new ArrayList<>();
     private final Map<String, List<String>> allowedProperties = new LinkedHashMap<>();
@@ -42,8 +43,9 @@ public final class EditPolicy {
     private final List<Entry> forbiddenTags = new ArrayList<>();
     private final Map<String, List<String>> forbiddenProperties = new LinkedHashMap<>();
 
-    private EditPolicy(boolean whitelist) {
+    private EditPolicy(boolean whitelist, boolean paste) {
         this.whitelist = whitelist;
+        this.paste = paste;
     }
 
     public static void ensureResource(JavaPlugin plugin) {
@@ -55,9 +57,13 @@ public final class EditPolicy {
         File file = new File(plugin.getDataFolder(), "debugstick.yml");
         if (!file.exists()) plugin.saveResource("debugstick.yml", false);
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-        EditPolicy policy = new EditPolicy(cfg.getBoolean("whitelist", true));
+        EditPolicy policy = new EditPolicy(cfg.getBoolean("whitelist", true), cfg.getBoolean("paste", true));
         policy.parse(cfg);
         return policy;
+    }
+
+    public boolean isPasteEnabled() {
+        return paste;
     }
 
     private void parse(YamlConfiguration cfg) {
