@@ -63,7 +63,7 @@ public final class DebugStickListener implements Listener {
                 selectProperty(player, block, forward);
             }
         } else {
-            if (DebugStick.hasCopiedState(item)
+            if (player.isSneaking() && DebugStick.hasCopiedState(item)
                     && block.getType().name().equals(DebugStick.getCopiedType(item))) {
                 applyState(player, block, item);
             } else {

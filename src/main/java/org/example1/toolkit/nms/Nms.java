@@ -131,8 +131,18 @@ public final class Nms {
 
     private static Object stateOf(BlockData data) throws ReflectiveOperationException {
         Field field = findField(data.getClass(), "state");
-        if (field == null) throw new NoSuchFieldException("state");
-        return field.get(data);
+        if (field != null) {
+            return field.get(data);
+        }
+        Method getState = findMethod(data.getClass(), "getState");
+        if (getState != null) {
+            return getState.invoke(data);
+        }
+        Method getNms = findMethod(data.getClass(), "getNMS");
+        if (getNms != null) {
+            return getNms.invoke(data);
+        }
+        throw new NoSuchFieldException("state/getState/getNMS");
     }
 
     private static Method findNewData(Class<?> clazz, Class<?> param) {
