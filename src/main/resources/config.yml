@@ -177,8 +177,8 @@ messages:
   level: "Ур."
   pcs: "шт."
 
-  # Дебагстик
-  debugstick: "Дебагстик"
+  # Палочка отладки
+  debugstick: "Палочка отладки"
   stick-state-copied: "Скопировано"
   stick-state-applied: "Применено"
   stick-state-fail: "Ошибка"
@@ -191,7 +191,7 @@ messages:
   # Прочее
   light-prefix: "Свет"
   light-level: "Яркость"
-  banner-hat-prefix: "Шлем-флаг"
+  banner-hat-prefix: "Флаг"
   banner-hat-equipped: "Надет"
   fire-elytra-prefix: "Элитра"
-  fire-elytra-blocked: "Запрещено в огне"
+  fire-elytra-blocked: "Невозможно лететь в огне"

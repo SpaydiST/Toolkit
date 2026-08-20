@@ -66,7 +66,7 @@ public final class Config {
     public static String MSG_LEVEL = "Ур.";
     public static String MSG_PCS = "шт.";
 
-    public static String MSG_DEBUGSTICK = "Дебагстик";
+    public static String MSG_DEBUGSTICK = "Палочка отладки";
     public static String MSG_NO_EDITABLE = "Нечего менять";
     public static String MSG_SELECTED = "Свойство";
     public static String MSG_CHANGED = "Изменено";
@@ -80,12 +80,12 @@ public final class Config {
     public static String MSG_LIGHT_LEVEL = "Яркость";
 
     public static boolean BANNER_HAT_ENABLED = true;
-    public static String MSG_BANNER_HAT_PREFIX = "Шлем-флаг";
+    public static String MSG_BANNER_HAT_PREFIX = "Флаг";
     public static String MSG_BANNER_HAT_EQUIPPED = "Надет";
 
     public static boolean FIRE_ELYTRA_ENABLED = true;
     public static String MSG_FIRE_ELYTRA_PREFIX = "Элитра";
-    public static String MSG_FIRE_ELYTRA_BLOCKED = "Запрещено в огне";
+    public static String MSG_FIRE_ELYTRA_BLOCKED = "Невозможно лететь в огне";
     public static boolean CAULDRON_BEDROCK_ENABLED = true;
 
     public static boolean PARROT_TRANSPLANT_ENABLED = true;

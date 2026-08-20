@@ -10,7 +10,7 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class Msg {
 
-    private static final Component SEP = Component.text(" \u00b7 ", DARK_GRAY);
+    private static final Component SEP = Component.text(" ", DARK_GRAY);
     private static final Component EQ = Component.text(" = ", DARK_GRAY);
     private static final Component SPACE = Component.text(" ", WHITE);
 
