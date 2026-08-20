@@ -20,7 +20,9 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionType;
 import org.example1.toolkit.Config;
 
 import java.util.HashSet;
@@ -51,6 +53,8 @@ public final class CauldronBedrockListener implements Listener {
 
         if (CauldronBedrock.isPotion(item)) {
             handlePotion(event, player, block, item, level);
+        } else if (item.getType() == Material.GLASS_BOTTLE && isWaterCauldron) {
+            handleBottleTake(event, player, block, item, level);
         } else if (CauldronBedrock.isDye(item) && isWaterCauldron) {
             handleDye(event, player, block, item, level);
         } else if (CauldronBedrock.isLeatherArmor(item) && isWaterCauldron) {
@@ -66,9 +70,11 @@ public final class CauldronBedrockListener implements Listener {
         event.setCancelled(true);
 
         if (CauldronBedrock.isWaterPotion(item)) {
+            CauldronBedrock.PotionData existing = CauldronBedrock.getPotion(block);
+            if (existing != null) return;
+            if (level >= 3) return;
             int newLevel = Math.min(level + 1, 3);
             CauldronBedrock.setWaterLevel(block, newLevel);
-            CauldronBedrock.removeAll(block);
             if (player.getGameMode() != GameMode.CREATIVE) {
                 item.setType(Material.GLASS_BOTTLE);
                 item.editMeta(m -> {});
@@ -79,6 +85,14 @@ public final class CauldronBedrockListener implements Listener {
 
         CauldronBedrock.PotionData data = CauldronBedrock.potionFromItem(item);
         if (data == null) return;
+
+        if (level >= 3) return;
+
+        CauldronBedrock.PotionData existing = CauldronBedrock.getPotion(block);
+        if (existing != null && existing.type() != data.type()) {
+            player.sendActionBar(Component.text("Нельзя смешивать разные зелья!", NamedTextColor.RED));
+            return;
+        }
 
         CauldronBedrock.setPotion(block, data);
         CauldronBedrock.setDyeColor(block, null);
@@ -95,6 +109,36 @@ public final class CauldronBedrockListener implements Listener {
 
         player.sendActionBar(Component.text("Зелье добавлено в котёл", NamedTextColor.LIGHT_PURPLE));
         spawnDust(block, color);
+    }
+
+    private void handleBottleTake(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
+        CauldronBedrock.PotionData data = CauldronBedrock.getPotion(block);
+        if (data == null) return;
+        if (level <= 0) return;
+
+        event.setCancelled(true);
+
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            ItemStack potion = new ItemStack(Material.POTION);
+            PotionMeta meta = (PotionMeta) potion.getItemMeta();
+            meta.setBasePotionType(data.type());
+            potion.setItemMeta(meta);
+            item.setAmount(item.getAmount() - 1);
+            if (player.getInventory().firstEmpty() == -1) {
+                player.getWorld().dropItemNaturally(player.getLocation(), potion);
+            } else {
+                player.getInventory().addItem(potion);
+            }
+        }
+
+        int newLevel = level - 1;
+        CauldronBedrock.setWaterLevel(block, newLevel);
+        if (newLevel <= 0) {
+            CauldronBedrock.removeAll(block);
+        } else {
+            CauldronBedrock.updateDisplayLevel(block, newLevel);
+        }
+        player.sendActionBar(Component.text("Зелье забрано из котла", NamedTextColor.LIGHT_PURPLE));
     }
 
     private void handleDye(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
