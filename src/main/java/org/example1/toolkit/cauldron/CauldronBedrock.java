@@ -216,7 +216,7 @@ public final class CauldronBedrock {
         }
 
         int newMixCount = Math.min(existing.mixCount() + 1, MAX_MIX);
-        PotionEffect bonus = rollBonusEffect(negCount, posCount, newMixCount);
+        PotionEffect bonus = rollBonusEffect(negCount, posCount, newMixCount, allEffects.size());
         if (bonus != null) {
             allEffects.add(bonus);
         }
@@ -230,10 +230,18 @@ public final class CauldronBedrock {
         return effects;
     }
 
-    private static PotionEffect rollBonusEffect(int negCount, int posCount, int mixCount) {
+    private static PotionEffect rollBonusEffect(int negCount, int posCount, int mixCount, int totalEffects) {
         double chance = mixCount * 0.25;
         ThreadLocalRandom rng = ThreadLocalRandom.current();
         if (rng.nextDouble() > chance) return null;
+
+        if (totalEffects > 5) {
+            PotionEffectType[] negatives = {
+                    PotionEffectType.NAUSEA, PotionEffectType.SLOWNESS,
+                    PotionEffectType.WEAKNESS, PotionEffectType.POISON
+            };
+            return new PotionEffect(negatives[rng.nextInt(negatives.length)], 200, 0);
+        }
 
         if (negCount > posCount) {
             PotionEffectType[] positives = {
