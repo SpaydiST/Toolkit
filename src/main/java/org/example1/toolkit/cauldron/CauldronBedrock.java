@@ -198,46 +198,56 @@ public final class CauldronBedrock {
         if (plugin == null) return;
         for (var world : plugin.getServer().getWorlds()) {
             for (Chunk chunk : world.getLoadedChunks()) {
-                PersistentDataContainer pdc = chunk.getPersistentDataContainer();
-                for (NamespacedKey key : pdc.getKeys()) {
-                    String keyStr = key.getKey();
-                    if (keyStr.startsWith("dye_")) {
-                        String coords = keyStr.substring(4);
-                        String[] parts = coords.split("_");
-                        if (parts.length != 3) continue;
-                        try {
-                            int x = Integer.parseInt(parts[0]);
-                            int y = Integer.parseInt(parts[1]);
-                            int z = Integer.parseInt(parts[2]);
-                            Block block = world.getBlockAt(x, y, z);
-                            if (block.getType() != Material.WATER_CAULDRON) continue;
-                            Integer rgb = pdc.get(key, PersistentDataType.INTEGER);
-                            if (rgb == null) continue;
-                            Color color = Color.fromRGB(rgb);
-                            int level = getWaterLevel(block);
-                            cauldronDyeColors.put(key(block.getLocation()), color);
-                            spawnColoredDisplay(block, color, level);
-                        } catch (NumberFormatException ignored) {}
-                    } else if (keyStr.startsWith("pot_")) {
-                        String coords = keyStr.substring(4);
-                        String[] parts = coords.split("_");
-                        if (parts.length != 3) continue;
-                        try {
-                            int x = Integer.parseInt(parts[0]);
-                            int y = Integer.parseInt(parts[1]);
-                            int z = Integer.parseInt(parts[2]);
-                            Block block = world.getBlockAt(x, y, z);
-                            if (block.getType() != Material.WATER_CAULDRON) continue;
-                            String typeName = pdc.get(key, PersistentDataType.STRING);
-                            if (typeName == null) continue;
-                            PotionType type = PotionType.valueOf(typeName);
-                            PotionData data = new PotionData(type, List.of());
-                            cauldronPotions.put(key(block.getLocation()), data);
-                            int level = getWaterLevel(block);
-                            spawnColoredDisplay(block, potionColor(type), level);
-                        } catch (Exception ignored) {}
-                    }
-                }
+                restoreChunk(chunk);
+            }
+        }
+    }
+
+    public static void restoreChunk(Chunk chunk) {
+        if (plugin == null) return;
+        PersistentDataContainer pdc = chunk.getPersistentDataContainer();
+        org.bukkit.World w = chunk.getWorld();
+        for (NamespacedKey key : pdc.getKeys()) {
+            String keyStr = key.getKey();
+            if (keyStr.startsWith("dye_")) {
+                String coords = keyStr.substring(4);
+                String[] parts = coords.split("_");
+                if (parts.length != 3) continue;
+                try {
+                    int x = Integer.parseInt(parts[0]);
+                    int y = Integer.parseInt(parts[1]);
+                    int z = Integer.parseInt(parts[2]);
+                    Block block = w.getBlockAt(x, y, z);
+                    if (block.getType() != Material.WATER_CAULDRON) continue;
+                    String mapKey = key(block.getLocation());
+                    if (cauldronDyeColors.containsKey(mapKey)) continue;
+                    Integer rgb = pdc.get(key, PersistentDataType.INTEGER);
+                    if (rgb == null) continue;
+                    Color color = Color.fromRGB(rgb);
+                    int level = getWaterLevel(block);
+                    cauldronDyeColors.put(mapKey, color);
+                    spawnColoredDisplay(block, color, level);
+                } catch (NumberFormatException ignored) {}
+            } else if (keyStr.startsWith("pot_")) {
+                String coords = keyStr.substring(4);
+                String[] parts = coords.split("_");
+                if (parts.length != 3) continue;
+                try {
+                    int x = Integer.parseInt(parts[0]);
+                    int y = Integer.parseInt(parts[1]);
+                    int z = Integer.parseInt(parts[2]);
+                    Block block = w.getBlockAt(x, y, z);
+                    if (block.getType() != Material.WATER_CAULDRON) continue;
+                    String mapKey = key(block.getLocation());
+                    if (cauldronPotions.containsKey(mapKey)) continue;
+                    String typeName = pdc.get(key, PersistentDataType.STRING);
+                    if (typeName == null) continue;
+                    PotionType type = PotionType.valueOf(typeName);
+                    PotionData data = new PotionData(type, List.of());
+                    cauldronPotions.put(mapKey, data);
+                    int level = getWaterLevel(block);
+                    spawnColoredDisplay(block, potionColor(type), level);
+                } catch (Exception ignored) {}
             }
         }
     }
@@ -267,7 +277,6 @@ public final class CauldronBedrock {
                         removeDisplay(block);
                         continue;
                     }
-                    spawnColoredParticles(block, entry.getValue());
                     ensureDisplay(block, entry.getValue());
                 }
                 var piter = cauldronPotions.entrySet().iterator();

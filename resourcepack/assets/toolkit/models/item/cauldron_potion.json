@@ -5,8 +5,8 @@
   },
   "elements": [
     {
-      "from": [0, 9.1, 0],
-      "to": [16, 9.11, 16],
+      "from": [0, 10.1, 0],
+      "to": [16, 10.11, 16],
       "faces": {
         "up":   { "texture": "#water", "tintindex": 0, "cullface": "up" },
         "down": { "texture": "#water", "tintindex": 0, "cullface": "down" }
