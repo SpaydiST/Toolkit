@@ -46,6 +46,8 @@ public final class CauldronBedrock {
     private static final NamespacedKey ITEM_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_water");
     private static final NamespacedKey POTION_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_potion");
     private static final int MAX_MIX = 3;
+    private static final NamespacedKey BOTTLE_MIX_COUNT = new NamespacedKey("toolkit", "bottle_mix_count");
+    private static final NamespacedKey BOTTLE_MIXED_TYPES = new NamespacedKey("toolkit", "bottle_mixed_types");
 
     private static JavaPlugin plugin;
 
@@ -646,7 +648,30 @@ public final class CauldronBedrock {
         PotionType type = meta.getBasePotionType();
         if (type == PotionType.WATER) return null;
         List<PotionEffect> effects = new ArrayList<>(meta.getCustomEffects());
-        return new PotionData(type, effects);
+        int mixCount = meta.getPersistentDataContainer().getOrDefault(BOTTLE_MIX_COUNT, PersistentDataType.INTEGER, 1);
+        String typesStr = meta.getPersistentDataContainer().getOrDefault(BOTTLE_MIXED_TYPES, PersistentDataType.STRING, "");
+        List<PotionType> mixedTypes;
+        if (typesStr.isEmpty()) {
+            mixedTypes = List.of(type);
+        } else {
+            mixedTypes = java.util.Arrays.stream(typesStr.split(","))
+                    .map(s -> { try { return PotionType.valueOf(s.trim()); } catch (Exception e) { return null; } })
+                    .filter(java.util.Objects::nonNull)
+                    .toList();
+            if (mixedTypes.isEmpty()) mixedTypes = List.of(type);
+        }
+        return new PotionData(type, effects, mixCount, mixedTypes);
+    }
+
+    public static void saveMixToItem(ItemStack item, PotionData data) {
+        if (!(item.getItemMeta() instanceof PotionMeta meta)) return;
+        meta.getPersistentDataContainer().set(BOTTLE_MIX_COUNT, PersistentDataType.INTEGER, data.mixCount());
+        String typesStr = data.mixedTypes().stream()
+                .map(Enum::name)
+                .reduce((a, b) -> a + "," + b)
+                .orElse(data.type().name());
+        meta.getPersistentDataContainer().set(BOTTLE_MIXED_TYPES, PersistentDataType.STRING, typesStr);
+        item.setItemMeta(meta);
     }
 
     public static void applyPotionToArmor(ItemStack item, PotionData data) {

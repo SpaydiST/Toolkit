@@ -153,24 +153,29 @@ public final class CauldronBedrockListener implements Listener {
     }
 
     private void handleBottleTake(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
-        CauldronBedrock.PotionData data = CauldronBedrock.getPotion(block);
-        if (data == null) return;
         if (level <= 0) return;
 
         event.setCancelled(true);
 
+        CauldronBedrock.PotionData data = CauldronBedrock.getPotion(block);
+
         if (player.getGameMode() != GameMode.CREATIVE) {
             ItemStack potion = new ItemStack(Material.POTION);
             PotionMeta meta = (PotionMeta) potion.getItemMeta();
-            if (data.mixCount() > 1) {
-                meta.setBasePotionType(PotionType.AWKWARD);
-                for (PotionEffect effect : CauldronBedrock.getAllEffects(data)) {
-                    meta.addCustomEffect(effect, true);
+            if (data != null) {
+                if (data.mixCount() > 1) {
+                    meta.setBasePotionType(PotionType.AWKWARD);
+                    for (PotionEffect effect : CauldronBedrock.getAllEffects(data)) {
+                        meta.addCustomEffect(effect, true);
+                    }
+                } else {
+                    meta.setBasePotionType(data.type());
                 }
-            } else {
-                meta.setBasePotionType(data.type());
             }
             potion.setItemMeta(meta);
+            if (data != null && data.mixCount() > 1) {
+                CauldronBedrock.saveMixToItem(potion, data);
+            }
             item.setAmount(item.getAmount() - 1);
             if (player.getInventory().firstEmpty() == -1) {
                 player.getWorld().dropItemNaturally(player.getLocation(), potion);

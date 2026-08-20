@@ -96,6 +96,6 @@ public final class DeathCoords {
         };
     }
 
-    private record DeathRecord(int x, int y, int z, String dimension) {
+    record DeathRecord(int x, int y, int z, String dimension) {
     }
 }
