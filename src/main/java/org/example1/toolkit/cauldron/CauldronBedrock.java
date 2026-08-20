@@ -141,7 +141,6 @@ public final class CauldronBedrock {
             ent.setShadowStrength(0f);
 
             Matrix4f transform = new Matrix4f();
-            transform.translate(-0.375f, 0f, -0.375f);
             transform.scale(0.75f, 1.0f, 0.75f);
             ent.setTransformationMatrix(transform);
         });

@@ -6,6 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.coords.CoordObfuscator;
 import org.example1.toolkit.coords.CoordOffsetListener;
@@ -104,6 +105,7 @@ public final class Toolkit extends JavaPlugin {
 
         registerToolkitCommand();
         registerDeathCoordsCommand();
+        registerCauldronTestCommand();
     }
 
     private void registerDeathCoordsCommand() {
@@ -116,6 +118,29 @@ public final class Toolkit extends JavaPlugin {
         deathCoords.setDescription("Координаты смерти: on/off — уведомления, без аргументов — показать последнюю смерть");
         deathCoords.setUsage("/deathcoords <on|off|show>");
         getServer().getCommandMap().register("deathcoords", deathCoords);
+    }
+
+    private void registerCauldronTestCommand() {
+        Command cmd = new Command("cauldrontest") {
+            @Override
+            public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+                if (!(sender instanceof Player player)) {
+                    sender.sendMessage("Only players");
+                    return true;
+                }
+                var item = new org.bukkit.inventory.ItemStack(org.bukkit.Material.LEATHER_HORSE_ARMOR);
+                var meta = (org.bukkit.inventory.meta.LeatherArmorMeta) item.getItemMeta();
+                meta.setColor(org.bukkit.Color.RED);
+                meta.setItemModel(new NamespacedKey("toolkit", "cauldron_water"));
+                item.setItemMeta(meta);
+                player.getInventory().addItem(item);
+                player.sendMessage(Component.text("Выдана тестовая котловая броня!", NamedTextColor.GREEN));
+                return true;
+            }
+        };
+        cmd.setDescription("Debug: give cauldron water test item");
+        cmd.setPermission("toolkit.reload");
+        getServer().getCommandMap().register("cauldron", cmd);
     }
 
     private void registerToolkitCommand() {
