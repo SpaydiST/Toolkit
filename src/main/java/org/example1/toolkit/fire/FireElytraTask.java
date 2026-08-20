@@ -9,6 +9,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 public final class FireElytraTask extends BukkitRunnable {
 
@@ -30,9 +31,10 @@ public final class FireElytraTask extends BukkitRunnable {
             if (chest == null || chest.getType() != Material.ELYTRA) continue;
 
             player.setGliding(false);
-            player.sendActionBar(Component.text(
-                    Lang.get(player, "fire-elytra-blocked"),
-                    NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "fire-elytra-prefix"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "fire-elytra-blocked")));
         }
     }
 }

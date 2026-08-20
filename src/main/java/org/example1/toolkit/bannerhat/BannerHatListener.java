@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 public final class BannerHatListener implements Listener {
 
@@ -48,8 +49,8 @@ public final class BannerHatListener implements Listener {
             item.setAmount(item.getAmount() - 1);
         }
 
-        player.sendActionBar(Component.text(
-                Lang.get(player, "banner-hat-equipped"),
-                NamedTextColor.GOLD));
+        player.sendActionBar(Msg.prefix(Lang.get(player, "banner-hat-prefix"), NamedTextColor.GOLD)
+                .append(Msg.sep())
+                .append(Msg.action(Lang.get(player, "banner-hat-equipped"))));
     }
 }

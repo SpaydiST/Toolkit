@@ -46,16 +46,44 @@ public final class Config {
     public static String MSG_NEED_MAGNET = "Сначала привяжи компас к магниту (ПКМ по магниту)";
     public static String MSG_MAGNET_BROKEN = "Магнит сломан — отслеживание сброшено";
     public static String MSG_UNBOUND = "Отслеживание и магнит сняты";
-    public static String MSG_NO_EDITABLE = "Здесь нечего менять";
-    public static String MSG_SELECTED = "Свойство: %s";
-    public static String MSG_CHANGED = "%s.%s = %s";
-    public static String MSG_USES_LEFT = "Использований: %s";
-    public static String MSG_STICK_BROKEN = "Палочка отладки сломалась";
-    public static String MSG_LIGHT_LEVEL = "☀ Яркость: %d";
+
+    public static String MSG_CAULDRON = "Котёл";
+    public static String MSG_WATER_FILLED = "Вода";
+    public static String MSG_POTION_ADDED = "Зелье добавлено";
+    public static String MSG_POTION_MIXED = "Зелья смешаны";
+    public static String MSG_POTION_FULL = "Макс. 3 зелья";
+    public static String MSG_POTION_TAKEN = "Зелье забрано";
+    public static String MSG_ARROWS_TIPPED = "Стрелы пропитаны";
+    public static String MSG_DYE_ADDED = "Краска добавлена";
+    public static String MSG_ARMOR_DYED = "Броня окрашена";
+    public static String MSG_ARMOR_POTIONED = "Броня пропитана зельем";
+    public static String MSG_ARMOR_CLEANED = "Броня очищена";
+    public static String MSG_BANNER_CLEANED = "Флаг очищен";
+    public static String MSG_SHULKER_CLEANED = "Шалкер очищен";
+    public static String MSG_MIXED = "Смешанное";
+    public static String MSG_LEVEL = "Ур.";
+    public static String MSG_PCS = "шт.";
+
+    public static String MSG_DEBUGSTICK = "Дебагстик";
+    public static String MSG_NO_EDITABLE = "Нечего менять";
+    public static String MSG_SELECTED = "Свойство";
+    public static String MSG_CHANGED = "Изменено";
+    public static String MSG_USES_LEFT = "Осталось";
+    public static String MSG_STICK_BROKEN = "Сломалась";
+    public static String MSG_STICK_STATE_COPIED = "Скопировано";
+    public static String MSG_STICK_STATE_APPLIED = "Применено";
+    public static String MSG_STICK_STATE_FAIL = "Ошибка";
+
+    public static String MSG_LIGHT_PREFIX = "Свет";
+    public static String MSG_LIGHT_LEVEL = "Яркость";
+
     public static boolean BANNER_HAT_ENABLED = true;
-    public static String MSG_BANNER_HAT_EQUIPPED = "Шлем-флаг надет";
+    public static String MSG_BANNER_HAT_PREFIX = "Шлем-флаг";
+    public static String MSG_BANNER_HAT_EQUIPPED = "Надет";
+
     public static boolean FIRE_ELYTRA_ENABLED = true;
-    public static String MSG_FIRE_ELYTRA_BLOCKED = "Нельзя лететь на элитрах в огне";
+    public static String MSG_FIRE_ELYTRA_PREFIX = "Элитра";
+    public static String MSG_FIRE_ELYTRA_BLOCKED = "Запрещено в огне";
     public static boolean CAULDRON_BEDROCK_ENABLED = true;
 
     public static boolean PARROT_TRANSPLANT_ENABLED = true;
@@ -115,17 +143,43 @@ public final class Config {
         MSG_NEED_MAGNET = c.getString("messages.need-magnet", MSG_NEED_MAGNET);
         MSG_MAGNET_BROKEN = c.getString("messages.magnet-broken", MSG_MAGNET_BROKEN);
         MSG_UNBOUND = c.getString("messages.unbound", MSG_UNBOUND);
+
+        MSG_CAULDRON = c.getString("messages.cauldron", MSG_CAULDRON);
+        MSG_WATER_FILLED = c.getString("messages.water-filled", MSG_WATER_FILLED);
+        MSG_POTION_ADDED = c.getString("messages.potion-added", MSG_POTION_ADDED);
+        MSG_POTION_MIXED = c.getString("messages.potion-mixed", MSG_POTION_MIXED);
+        MSG_POTION_FULL = c.getString("messages.potion-full", MSG_POTION_FULL);
+        MSG_POTION_TAKEN = c.getString("messages.potion-taken", MSG_POTION_TAKEN);
+        MSG_ARROWS_TIPPED = c.getString("messages.arrows-tipped", MSG_ARROWS_TIPPED);
+        MSG_DYE_ADDED = c.getString("messages.dye-added", MSG_DYE_ADDED);
+        MSG_ARMOR_DYED = c.getString("messages.armor-dyed", MSG_ARMOR_DYED);
+        MSG_ARMOR_POTIONED = c.getString("messages.armor-potioned", MSG_ARMOR_POTIONED);
+        MSG_ARMOR_CLEANED = c.getString("messages.armor-cleaned", MSG_ARMOR_CLEANED);
+        MSG_BANNER_CLEANED = c.getString("messages.banner-cleaned", MSG_BANNER_CLEANED);
+        MSG_SHULKER_CLEANED = c.getString("messages.shulker-cleaned", MSG_SHULKER_CLEANED);
+        MSG_MIXED = c.getString("messages.mixed", MSG_MIXED);
+        MSG_LEVEL = c.getString("messages.level", MSG_LEVEL);
+        MSG_PCS = c.getString("messages.pcs", MSG_PCS);
+
+        MSG_DEBUGSTICK = c.getString("messages.debugstick", MSG_DEBUGSTICK);
         MSG_NO_EDITABLE = c.getString("messages.no-editable", MSG_NO_EDITABLE);
         MSG_SELECTED = c.getString("messages.selected", MSG_SELECTED);
         MSG_CHANGED = c.getString("messages.changed", MSG_CHANGED);
         MSG_USES_LEFT = c.getString("messages.uses-left", MSG_USES_LEFT);
         MSG_STICK_BROKEN = c.getString("messages.stick-broken", MSG_STICK_BROKEN);
-        MSG_LIGHT_LEVEL = c.getString("messages.invisible-light-level", MSG_LIGHT_LEVEL);
+        MSG_STICK_STATE_COPIED = c.getString("messages.stick-state-copied", MSG_STICK_STATE_COPIED);
+        MSG_STICK_STATE_APPLIED = c.getString("messages.stick-state-applied", MSG_STICK_STATE_APPLIED);
+        MSG_STICK_STATE_FAIL = c.getString("messages.stick-state-fail", MSG_STICK_STATE_FAIL);
+
+        MSG_LIGHT_PREFIX = c.getString("messages.light-prefix", MSG_LIGHT_PREFIX);
+        MSG_LIGHT_LEVEL = c.getString("messages.light-level", MSG_LIGHT_LEVEL);
 
         BANNER_HAT_ENABLED = c.getBoolean("banner-hat.enabled", true);
+        MSG_BANNER_HAT_PREFIX = c.getString("messages.banner-hat-prefix", MSG_BANNER_HAT_PREFIX);
         MSG_BANNER_HAT_EQUIPPED = c.getString("messages.banner-hat-equipped", MSG_BANNER_HAT_EQUIPPED);
 
         FIRE_ELYTRA_ENABLED = c.getBoolean("fire-elytra.enabled", true);
+        MSG_FIRE_ELYTRA_PREFIX = c.getString("messages.fire-elytra-prefix", MSG_FIRE_ELYTRA_PREFIX);
         MSG_FIRE_ELYTRA_BLOCKED = c.getString("messages.fire-elytra-blocked", MSG_FIRE_ELYTRA_BLOCKED);
 
         CAULDRON_BEDROCK_ENABLED = c.getBoolean("cauldron-bedrock.enabled", true);

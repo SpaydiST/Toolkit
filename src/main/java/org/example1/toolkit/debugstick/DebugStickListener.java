@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 import org.example1.toolkit.nms.Nms;
 
 import java.util.ArrayList;
@@ -52,9 +53,12 @@ public final class DebugStickListener implements Listener {
         if (action == Action.LEFT_CLICK_BLOCK) {
             if (player.isSneaking()) {
                 DebugStick.saveState(item, block);
-                player.sendActionBar(Component.text(
-                        Lang.get(player, "stick-state-copied").formatted(block.getType().name().toLowerCase()),
-                        NamedTextColor.GREEN));
+                Msg.of(player,
+                        Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GREEN),
+                        Msg.sep(),
+                        Msg.action(Lang.get(player, "stick-state-copied")),
+                        Msg.sep(),
+                        Msg.val(block.getType().name().toLowerCase()));
             } else {
                 selectProperty(player, block, forward);
             }
@@ -66,7 +70,10 @@ public final class DebugStickListener implements Listener {
                 if (modifyValue(player, block, forward)) {
                     DebugStick.consumeUse(item);
                     if (!DebugStick.isDebugStick(item)) {
-                        player.sendActionBar(Component.text(Lang.get(player, "stick-broken"), NamedTextColor.RED));
+                        Msg.of(player,
+                                Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                                Msg.sep(),
+                                Msg.action(Lang.get(player, "stick-broken")));
                     }
                 }
             }
@@ -76,17 +83,26 @@ public final class DebugStickListener implements Listener {
     private void applyState(Player player, Block block, ItemStack item) {
         BlockData newData = DebugStick.getCopiedState(item);
         if (newData == null) {
-            player.sendActionBar(Component.text(Lang.get(player, "stick-state-fail"), NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "stick-state-fail")));
             return;
         }
         block.setBlockData(newData);
         DebugStick.consumeUse(item);
         if (!DebugStick.isDebugStick(item)) {
-            player.sendActionBar(Component.text(Lang.get(player, "stick-broken"), NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "stick-broken")));
         } else {
-            player.sendActionBar(Component.text(
-                    Lang.get(player, "stick-state-applied").formatted(block.getType().name().toLowerCase()),
-                    NamedTextColor.GREEN));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GREEN),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "stick-state-applied")),
+                    Msg.sep(),
+                    Msg.val(block.getType().name().toLowerCase()));
         }
     }
 
@@ -112,7 +128,10 @@ public final class DebugStickListener implements Listener {
         Map<String, List<String>> editable = editable(block);
         List<String> names = new ArrayList<>(editable.keySet());
         if (names.isEmpty()) {
-            player.sendActionBar(Component.text(Lang.get(player, "no-editable"), NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "no-editable")));
             return;
         }
 
@@ -127,15 +146,21 @@ public final class DebugStickListener implements Listener {
 
         String propName = names.get(index);
         selection.put(key, propName);
-        player.sendActionBar(Component.text(
-                Lang.get(player, "selected").formatted(propName),
-                NamedTextColor.GRAY));
+        Msg.of(player,
+                Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GRAY),
+                Msg.sep(),
+                Msg.action(Lang.get(player, "selected")),
+                Msg.sep(),
+                Msg.val(propName));
     }
 
     private boolean modifyValue(Player player, Block block, boolean forward) {
         Map<String, List<String>> editable = editable(block);
         if (editable.isEmpty()) {
-            player.sendActionBar(Component.text(Lang.get(player, "no-editable"), NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "no-editable")));
             return false;
         }
 
@@ -148,14 +173,20 @@ public final class DebugStickListener implements Listener {
 
         List<Object> values = resolveValues(block.getBlockData(), propName, editable.get(propName));
         if (values.size() < 2) {
-            player.sendActionBar(Component.text(Lang.get(player, "no-editable"), NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "no-editable")));
             return false;
         }
 
         Object cur = Nms.currentValue(block.getBlockData(), propName);
         int curIdx = values.indexOf(cur);
         if (curIdx < 0) {
-            player.sendActionBar(Component.text(Lang.get(player, "no-editable"), NamedTextColor.RED));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "no-editable")));
             return false;
         }
 
@@ -166,9 +197,13 @@ public final class DebugStickListener implements Listener {
         }
         block.setBlockData(newData);
 
-        player.sendActionBar(Component.text(
-                Lang.get(player, "changed").formatted(block.getType().name().toLowerCase(), propName, String.valueOf(values.get(newIdx))),
-                NamedTextColor.GRAY));
+        Component msg = Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GRAY)
+                .append(Msg.sep())
+                .append(Msg.dim(block.getType().name().toLowerCase()))
+                .append(Msg.eq())
+                .append(Msg.val(propName + " = "))
+                .append(Msg.accent(String.valueOf(values.get(newIdx)), NamedTextColor.WHITE));
+        player.sendActionBar(msg);
         return true;
     }
 

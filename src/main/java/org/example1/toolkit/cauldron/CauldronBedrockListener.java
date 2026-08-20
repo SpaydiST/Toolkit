@@ -25,6 +25,8 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 import org.example1.toolkit.Config;
+import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 import java.util.HashSet;
 import java.util.List;
@@ -83,7 +85,13 @@ public final class CauldronBedrockListener implements Listener {
                 item.setType(Material.GLASS_BOTTLE);
                 item.editMeta(m -> {});
             }
-            player.sendActionBar(Component.text("Котёл наполнен водой", NamedTextColor.AQUA));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.AQUA),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "water-filled")),
+                    Msg.sep(),
+                    Msg.dim(Lang.get(player, "level")),
+                    Msg.level(newLevel, 3));
             return;
         }
 
@@ -97,14 +105,22 @@ public final class CauldronBedrockListener implements Listener {
         CauldronBedrock.PotionData result;
         if (existing != null) {
             if (!CauldronBedrock.canMix(existing, data)) {
-                player.sendActionBar(Component.text("Котёл уже содержит 3 зелья!", NamedTextColor.RED));
+                Msg.of(player,
+                        Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.RED),
+                        Msg.sep(),
+                        Msg.action(Lang.get(player, "potion-full")));
                 return;
             }
             if (existing.type() == data.type() && existing.mixCount() == 1) {
                 result = new CauldronBedrock.PotionData(data.type(), List.of(), 1, List.of(data.type()));
             } else {
                 result = CauldronBedrock.mixPotions(existing, data);
-                player.sendActionBar(Component.text("Зелья смешаны! (" + result.mixCount() + "/3)", NamedTextColor.LIGHT_PURPLE));
+                Msg.of(player,
+                        Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.LIGHT_PURPLE),
+                        Msg.sep(),
+                        Msg.action(Lang.get(player, "potion-mixed")),
+                        Msg.sep(),
+                        Msg.level(result.mixCount(), 3));
             }
         } else {
             result = data;
@@ -126,7 +142,12 @@ public final class CauldronBedrockListener implements Listener {
         }
 
         if (existing == null || existing.type() == data.type()) {
-            player.sendActionBar(Component.text("Зелье добавлено в котёл", NamedTextColor.LIGHT_PURPLE));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.LIGHT_PURPLE),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "potion-added")),
+                    Msg.sep(),
+                    Msg.level(newLevel, 3));
         }
         spawnDust(block, color);
     }
@@ -165,7 +186,12 @@ public final class CauldronBedrockListener implements Listener {
         } else {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
-        player.sendActionBar(Component.text("Зелье забрано из котла", NamedTextColor.LIGHT_PURPLE));
+        Msg.of(player,
+                Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.LIGHT_PURPLE),
+                Msg.sep(),
+                Msg.action(Lang.get(player, "potion-taken")),
+                Msg.sep(),
+                Msg.level(Math.max(newLevel, 0), 3));
     }
 
     private void handleArrow(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
@@ -209,8 +235,17 @@ public final class CauldronBedrockListener implements Listener {
         } else {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
-        String typeLabel = isMixed ? " (смешанное)" : "";
-        player.sendActionBar(Component.text("Стрелы пропитаны! " + arrowsToTip + " шт. (уровень: " + Math.max(newLevel, 0) + "/3)" + typeLabel, NamedTextColor.LIGHT_PURPLE));
+        Component arrowMsg = Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.LIGHT_PURPLE)
+                .append(Msg.sep())
+                .append(Msg.action(Lang.get(player, "arrows-tipped")))
+                .append(Msg.sep())
+                .append(Msg.count(arrowsToTip, Lang.get(player, "pcs")))
+                .append(Msg.sep())
+                .append(Msg.level(Math.max(newLevel, 0), 3));
+        if (isMixed) {
+            arrowMsg = arrowMsg.append(Msg.sep()).append(Msg.accent(Lang.get(player, "mixed"), NamedTextColor.LIGHT_PURPLE));
+        }
+        player.sendActionBar(arrowMsg);
     }
 
     private void handleDye(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
@@ -231,7 +266,12 @@ public final class CauldronBedrockListener implements Listener {
             item.setAmount(item.getAmount() - 1);
         }
 
-        player.sendActionBar(Component.text("Краска добавлена в котёл", NamedTextColor.AQUA));
+        Msg.of(player,
+                Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.AQUA),
+                Msg.sep(),
+                Msg.action(Lang.get(player, "dye-added")),
+                Msg.sep(),
+                Msg.level(level, 3));
     }
 
     private void handleLeatherArmor(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
@@ -248,7 +288,10 @@ public final class CauldronBedrockListener implements Listener {
             } else {
                 CauldronBedrock.updateDisplayLevel(block, newLevel);
             }
-            player.sendActionBar(Component.text("Броня окрашена!", NamedTextColor.GREEN));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "armor-dyed")));
         } else if (potionData != null) {
             event.setCancelled(true);
             CauldronBedrock.applyPotionToArmor(item, potionData);
@@ -259,7 +302,10 @@ public final class CauldronBedrockListener implements Listener {
             } else {
                 CauldronBedrock.updateDisplayLevel(block, newLevel);
             }
-            player.sendActionBar(Component.text("Броня пропитана зельем!", NamedTextColor.GREEN));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "armor-potioned")));
         } else {
             LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
             boolean isDefault = CauldronBedrock.isDefaultLeatherColor(meta);
@@ -274,7 +320,10 @@ public final class CauldronBedrockListener implements Listener {
             } else {
                 CauldronBedrock.updateDisplayLevel(block, newLevel);
             }
-            player.sendActionBar(Component.text("Броня очищена", NamedTextColor.GREEN));
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "armor-cleaned")));
         }
     }
 
@@ -288,7 +337,10 @@ public final class CauldronBedrockListener implements Listener {
         } else {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
-        player.sendActionBar(Component.text("Флаг очищен", NamedTextColor.GREEN));
+        Msg.of(player,
+                Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                Msg.sep(),
+                Msg.action(Lang.get(player, "banner-cleaned")));
     }
 
     private void handleCleanShulker(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
@@ -301,7 +353,10 @@ public final class CauldronBedrockListener implements Listener {
         } else {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
-        player.sendActionBar(Component.text("Шалкер очищен", NamedTextColor.GREEN));
+        Msg.of(player,
+                Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                Msg.sep(),
+                Msg.action(Lang.get(player, "shulker-cleaned")));
     }
 
     @EventHandler
@@ -319,7 +374,7 @@ public final class CauldronBedrockListener implements Listener {
             if (data != null) {
                 nowInside = true;
                 if (!wasInside) {
-                    for (PotionEffect effect : CauldronBedrock.potionEffects(data.type())) {
+                    for (PotionEffect effect : CauldronBedrock.getAllEffects(data)) {
                         player.addPotionEffect(effect);
                     }
                     inPotionCauldron.add(player.getUniqueId());

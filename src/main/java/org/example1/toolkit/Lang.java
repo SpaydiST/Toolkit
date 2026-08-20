@@ -72,13 +72,36 @@ public final class Lang {
         fallback("to-night", () -> Config.MSG_TO_NIGHT);
         fallback("to-morning", () -> Config.MSG_TO_MORNING);
         fallback("to-morning-fast", () -> Config.MSG_TO_MORNING_FAST);
+        fallback("cauldron", () -> Config.MSG_CAULDRON);
+        fallback("water-filled", () -> Config.MSG_WATER_FILLED);
+        fallback("potion-added", () -> Config.MSG_POTION_ADDED);
+        fallback("potion-mixed", () -> Config.MSG_POTION_MIXED);
+        fallback("potion-full", () -> Config.MSG_POTION_FULL);
+        fallback("potion-taken", () -> Config.MSG_POTION_TAKEN);
+        fallback("arrows-tipped", () -> Config.MSG_ARROWS_TIPPED);
+        fallback("dye-added", () -> Config.MSG_DYE_ADDED);
+        fallback("armor-dyed", () -> Config.MSG_ARMOR_DYED);
+        fallback("armor-potioned", () -> Config.MSG_ARMOR_POTIONED);
+        fallback("armor-cleaned", () -> Config.MSG_ARMOR_CLEANED);
+        fallback("banner-cleaned", () -> Config.MSG_BANNER_CLEANED);
+        fallback("shulker-cleaned", () -> Config.MSG_SHULKER_CLEANED);
+        fallback("mixed", () -> Config.MSG_MIXED);
+        fallback("level", () -> Config.MSG_LEVEL);
+        fallback("pcs", () -> Config.MSG_PCS);
+        fallback("debugstick", () -> Config.MSG_DEBUGSTICK);
         fallback("no-editable", () -> Config.MSG_NO_EDITABLE);
         fallback("selected", () -> Config.MSG_SELECTED);
         fallback("changed", () -> Config.MSG_CHANGED);
         fallback("uses-left", () -> Config.MSG_USES_LEFT);
         fallback("stick-broken", () -> Config.MSG_STICK_BROKEN);
-        fallback("invisible-light-level", () -> Config.MSG_LIGHT_LEVEL);
+        fallback("stick-state-copied", () -> Config.MSG_STICK_STATE_COPIED);
+        fallback("stick-state-applied", () -> Config.MSG_STICK_STATE_APPLIED);
+        fallback("stick-state-fail", () -> Config.MSG_STICK_STATE_FAIL);
+        fallback("light-prefix", () -> Config.MSG_LIGHT_PREFIX);
+        fallback("light-level", () -> Config.MSG_LIGHT_LEVEL);
+        fallback("banner-hat-prefix", () -> Config.MSG_BANNER_HAT_PREFIX);
         fallback("banner-hat-equipped", () -> Config.MSG_BANNER_HAT_EQUIPPED);
+        fallback("fire-elytra-prefix", () -> Config.MSG_FIRE_ELYTRA_PREFIX);
         fallback("fire-elytra-blocked", () -> Config.MSG_FIRE_ELYTRA_BLOCKED);
     }
 

@@ -23,6 +23,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,9 +108,12 @@ public final class InvisibleLightListener implements Listener {
             }
 
             InvisibleLightRecipe.setLevel(item, next);
-            event.getPlayer().sendActionBar(Component.text(
-                    Lang.get(event.getPlayer(), "invisible-light-level").formatted(next),
-                    NamedTextColor.YELLOW));
+            Msg.of(event.getPlayer(),
+                    Msg.prefix(Lang.get(event.getPlayer(), "light-prefix"), NamedTextColor.YELLOW),
+                    Msg.sep(),
+                    Msg.action(Lang.get(event.getPlayer(), "light-level")),
+                    Msg.sep(),
+                    Msg.val(String.valueOf(next)));
 
         } else if (action == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
