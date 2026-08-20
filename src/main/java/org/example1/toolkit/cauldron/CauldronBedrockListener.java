@@ -81,6 +81,10 @@ public final class CauldronBedrockListener implements Listener {
             if (level >= 3) return;
             int newLevel = Math.min(level + 1, 3);
             CauldronBedrock.setWaterLevel(block, newLevel);
+            Color dyeColor = CauldronBedrock.getDyeColor(block);
+            if (dyeColor != null) {
+                CauldronBedrock.updateDisplayLevel(block, newLevel);
+            }
             if (player.getGameMode() != GameMode.CREATIVE) {
                 item.setType(Material.GLASS_BOTTLE);
                 item.editMeta(m -> {});
@@ -171,6 +175,8 @@ public final class CauldronBedrockListener implements Listener {
                 } else {
                     meta.setBasePotionType(data.type());
                 }
+            } else {
+                meta.setBasePotionType(PotionType.WATER);
             }
             potion.setItemMeta(meta);
             if (data != null && data.mixCount() > 1) {
