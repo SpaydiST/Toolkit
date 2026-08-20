@@ -150,7 +150,7 @@ public final class CauldronBedrockListener implements Listener {
 
         event.setCancelled(true);
 
-        int maxTippable = level * 16;
+        int maxTippable = level * 21;
         int arrowsToTip = Math.min(item.getAmount(), maxTippable);
         if (arrowsToTip <= 0) return;
 
@@ -167,7 +167,7 @@ public final class CauldronBedrockListener implements Listener {
             }
         }
 
-        int levelsUsed = (int) Math.ceil(arrowsToTip / 16.0);
+        int levelsUsed = (int) Math.ceil(arrowsToTip / 21.0);
         int newLevel = level - levelsUsed;
         CauldronBedrock.setWaterLevel(block, newLevel);
         if (newLevel <= 0) {
