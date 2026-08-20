@@ -106,9 +106,14 @@ public final class CauldronBedrock {
     public static void setWaterLevel(Block block, int level) {
         if (level <= 0) {
             block.setType(Material.CAULDRON);
-        } else if (block.getBlockData() instanceof Levelled l) {
-            l.setLevel(Math.max(1, Math.min(l.getMaximumLevel(), level)));
-            block.setBlockData(l);
+        } else {
+            if (block.getType() != Material.WATER_CAULDRON) {
+                block.setType(Material.WATER_CAULDRON);
+            }
+            if (block.getBlockData() instanceof Levelled l) {
+                l.setLevel(Math.max(1, Math.min(l.getMaximumLevel(), level)));
+                block.setBlockData(l);
+            }
         }
     }
 
@@ -125,7 +130,7 @@ public final class CauldronBedrock {
         }
 
         double waterY = waterLevelY(level);
-        Location loc = block.getLocation().add(0.5, waterY, 0.5);
+        Location loc = block.getLocation().add(0.5, waterY + 0.005, 0.5);
 
         ItemDisplay display = block.getWorld().spawn(loc, ItemDisplay.class, ent -> {
             ItemStack fluidItem = new ItemStack(Material.LEATHER_HORSE_ARMOR);
@@ -136,11 +141,11 @@ public final class CauldronBedrock {
 
             ent.setItemStack(fluidItem);
             ent.setItemDisplayTransform(ItemDisplay.ItemDisplayTransform.NONE);
-
             ent.setPersistent(false);
             ent.setViewRange(1.0f);
             ent.setShadowRadius(0f);
             ent.setShadowStrength(0f);
+            ent.setBrightness(new Display.Brightness(15, 15));
 
             Matrix4f transform = new Matrix4f();
             transform.scale(0.75f, 1.0f, 0.75f);
@@ -234,7 +239,7 @@ public final class CauldronBedrock {
         }
     }
 
-    private static double waterLevelY(int level) {
+    public static double waterLevelY(int level) {
         return switch (level) {
             case 1 -> 0.375;
             case 2 -> 0.625;
@@ -292,10 +297,11 @@ public final class CauldronBedrock {
 
     private static void spawnColoredParticles(Block block, Color c) {
         int level = getWaterLevel(block);
-        double y = 0.45 + level * 0.25;
+        if (level <= 0) return;
+        double y = waterLevelY(level) - 0.02;
         Location loc = block.getLocation().add(0.5, y, 0.5);
-        block.getWorld().spawnParticle(Particle.DUST, loc, 8, 0.2, 0.02, 0.2, 0,
-                new Particle.DustOptions(c, 1.2f));
+        block.getWorld().spawnParticle(Particle.DUST, loc, 10, 0.15, 0.01, 0.15, 0,
+                new Particle.DustOptions(c, 1.0f));
     }
 
     public static Color potionColor(PotionType type) {

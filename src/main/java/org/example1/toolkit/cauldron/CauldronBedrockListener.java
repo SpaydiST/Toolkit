@@ -190,11 +190,11 @@ public final class CauldronBedrockListener implements Listener {
 
     private void spawnDust(Block block, Color color) {
         int level = CauldronBedrock.getWaterLevel(block);
-        double y = 0.45 + level * 0.25;
+        double y = level > 0 ? CauldronBedrock.waterLevelY(level) - 0.02 : 0.5;
         block.getWorld().spawnParticle(
                 Particle.DUST,
                 block.getLocation().add(0.5, y, 0.5),
-                8, 0.2, 0.02, 0.2, 0,
-                new Particle.DustOptions(color, 1.2f));
+                10, 0.15, 0.01, 0.15, 0,
+                new Particle.DustOptions(color, 1.0f));
     }
 }
