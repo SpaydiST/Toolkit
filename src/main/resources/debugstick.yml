@@ -14,7 +14,6 @@ allowed:
     - id: glass_panes
     - id: fences
     - id: trapdoors
-    - id: doors
     - id: fence_gates
   blocks:
     - id: iron_bars
