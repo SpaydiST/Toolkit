@@ -3,7 +3,10 @@
     "type": "minecraft:model",
     "model": "toolkit:item/cauldron_water",
     "tints": [
-      { "type": "minecraft:dye" }
+      {
+        "type": "minecraft:dye",
+        "default": 16777215
+      }
     ]
   }
 }

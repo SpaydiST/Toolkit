@@ -104,8 +104,10 @@ public final class CauldronBedrock {
     }
 
     public static void setWaterLevel(Block block, int level) {
-        if (block.getBlockData() instanceof Levelled l) {
-            l.setLevel(Math.max(0, Math.min(l.getMaximumLevel(), level)));
+        if (level <= 0) {
+            block.setType(Material.CAULDRON);
+        } else if (block.getBlockData() instanceof Levelled l) {
+            l.setLevel(Math.max(1, Math.min(l.getMaximumLevel(), level)));
             block.setBlockData(l);
         }
     }
