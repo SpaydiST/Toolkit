@@ -14,13 +14,21 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.potion.PotionEffect;
 import org.example1.toolkit.Config;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
 public final class CauldronBedrockListener implements Listener {
+
+    private final Set<UUID> inPotionCauldron = new HashSet<>();
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onInteract(PlayerInteractEvent event) {
@@ -178,6 +186,34 @@ public final class CauldronBedrockListener implements Listener {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
         player.sendActionBar(Component.text("Шалкер очищен", NamedTextColor.GREEN));
+    }
+
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        if (!Config.CAULDRON_BEDROCK_ENABLED) return;
+        Player player = event.getPlayer();
+        Block toBlock = event.getTo() != null ? event.getTo().getBlock() : null;
+        if (toBlock == null) return;
+
+        boolean wasInside = inPotionCauldron.contains(player.getUniqueId());
+        boolean nowInside = false;
+
+        if (toBlock.getType() == Material.WATER_CAULDRON) {
+            CauldronBedrock.PotionData data = CauldronBedrock.getPotion(toBlock);
+            if (data != null) {
+                nowInside = true;
+                if (!wasInside) {
+                    for (PotionEffect effect : CauldronBedrock.potionEffects(data.type())) {
+                        player.addPotionEffect(effect);
+                    }
+                    inPotionCauldron.add(player.getUniqueId());
+                }
+            }
+        }
+
+        if (!nowInside && wasInside) {
+            inPotionCauldron.remove(player.getUniqueId());
+        }
     }
 
     @EventHandler

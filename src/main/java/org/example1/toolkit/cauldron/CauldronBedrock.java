@@ -358,6 +358,55 @@ public final class CauldronBedrock {
         };
     }
 
+    public static List<PotionEffect> potionEffects(PotionType type) {
+        return switch (type) {
+            case FIRE_RESISTANCE -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, 400, 0));
+            case LONG_FIRE_RESISTANCE -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE, 960, 0));
+            case SWIFTNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 360, 0));
+            case LONG_SWIFTNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 960, 0));
+            case STRONG_SWIFTNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SPEED, 360, 2));
+            case SLOWNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 360, 0));
+            case LONG_SLOWNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 960, 0));
+            case STRONG_SLOWNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 360, 3));
+            case HEALING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INSTANT_HEALTH, 1, 0));
+            case STRONG_HEALING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INSTANT_HEALTH, 1, 1));
+            case HARMING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INSTANT_DAMAGE, 1, 0));
+            case STRONG_HARMING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INSTANT_DAMAGE, 1, 1));
+            case LEAPING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.JUMP_BOOST, 360, 0));
+            case LONG_LEAPING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.JUMP_BOOST, 960, 0));
+            case STRONG_LEAPING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.JUMP_BOOST, 360, 2));
+            case INVISIBILITY -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY, 360, 0));
+            case LONG_INVISIBILITY -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY, 960, 0));
+            case POISON -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.POISON, 400, 0));
+            case LONG_POISON -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.POISON, 960, 0));
+            case STRONG_POISON -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.POISON, 200, 2));
+            case REGENERATION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.REGENERATION, 400, 0));
+            case LONG_REGENERATION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.REGENERATION, 960, 0));
+            case STRONG_REGENERATION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.REGENERATION, 160, 2));
+            case STRENGTH -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.STRENGTH, 360, 0));
+            case LONG_STRENGTH -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.STRENGTH, 960, 0));
+            case STRONG_STRENGTH -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.STRENGTH, 360, 2));
+            case WEAKNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, 360, 0));
+            case LONG_WEAKNESS -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.WEAKNESS, 960, 0));
+            case TURTLE_MASTER -> List.of(
+                    new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 400, 3),
+                    new PotionEffect(org.bukkit.potion.PotionEffectType.RESISTANCE, 400, 2));
+            case LONG_TURTLE_MASTER -> List.of(
+                    new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 800, 3),
+                    new PotionEffect(org.bukkit.potion.PotionEffectType.RESISTANCE, 800, 2));
+            case STRONG_TURTLE_MASTER -> List.of(
+                    new PotionEffect(org.bukkit.potion.PotionEffectType.SLOWNESS, 400, 5),
+                    new PotionEffect(org.bukkit.potion.PotionEffectType.RESISTANCE, 400, 3));
+            case WATER_BREATHING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.WATER_BREATHING, 360, 0));
+            case LONG_WATER_BREATHING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.WATER_BREATHING, 960, 0));
+            case SLOW_FALLING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOW_FALLING, 360, 0));
+            case LONG_SLOW_FALLING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOW_FALLING, 960, 0));
+            case NIGHT_VISION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.NIGHT_VISION, 360, 0));
+            case LONG_NIGHT_VISION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.NIGHT_VISION, 960, 0));
+            default -> List.of();
+        };
+    }
+
     public static boolean isPotion(ItemStack item) {
         Material m = item.getType();
         return m == Material.POTION || m == Material.SPLASH_POTION || m == Material.LINGERING_POTION;
