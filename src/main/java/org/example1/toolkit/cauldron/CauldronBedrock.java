@@ -254,10 +254,10 @@ public final class CauldronBedrock {
 
     public static double waterLevelY(int level) {
         return switch (level) {
-            case 1 -> 0.375;
-            case 2 -> 0.625;
+            case 1 -> 0.5;
+            case 2 -> 0.6875;
             case 3 -> 0.875;
-            default -> 0.375;
+            default -> 0.5;
         };
     }
 
