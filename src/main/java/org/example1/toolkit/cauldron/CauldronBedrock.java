@@ -188,7 +188,8 @@ public final class CauldronBedrock {
             PotionType.LEAPING, PotionType.LONG_LEAPING, PotionType.STRONG_LEAPING,
             PotionType.INVISIBILITY, PotionType.LONG_INVISIBILITY,
             PotionType.SLOW_FALLING, PotionType.LONG_SLOW_FALLING,
-            PotionType.LUCK, PotionType.TURTLE_MASTER, PotionType.LONG_TURTLE_MASTER, PotionType.STRONG_TURTLE_MASTER
+            PotionType.LUCK, PotionType.TURTLE_MASTER, PotionType.LONG_TURTLE_MASTER, PotionType.STRONG_TURTLE_MASTER,
+            PotionType.OOZING, PotionType.WEAVING, PotionType.WIND_CHARGED
     );
 
     public static boolean canMix(PotionData existing, PotionData incoming) {
@@ -619,6 +620,11 @@ public final class CauldronBedrock {
             case LONG_SLOW_FALLING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.SLOW_FALLING, 960, 0));
             case NIGHT_VISION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.NIGHT_VISION, 360, 0));
             case LONG_NIGHT_VISION -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.NIGHT_VISION, 960, 0));
+            case LUCK -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.LUCK, 600, 0));
+            case OOZING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.OOZING, 600, 0));
+            case WEAVING -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.WEAVING, 600, 0));
+            case WIND_CHARGED -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.WIND_CHARGED, 600, 0));
+            case INFESTED -> List.of(new PotionEffect(org.bukkit.potion.PotionEffectType.INFESTED, 600, 0));
             default -> List.of();
         };
     }
