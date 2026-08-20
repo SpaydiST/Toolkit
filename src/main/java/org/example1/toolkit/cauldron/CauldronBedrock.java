@@ -646,6 +646,11 @@ public final class CauldronBedrock {
     public static PotionData potionFromItem(ItemStack item) {
         if (!(item.getItemMeta() instanceof PotionMeta meta)) return null;
         PotionType type = meta.getBasePotionType();
+        if (type == null) {
+            List<PotionEffect> effects = new ArrayList<>(meta.getCustomEffects());
+            if (effects.isEmpty()) return null;
+            type = PotionType.AWKWARD;
+        }
         if (type == PotionType.WATER) return null;
         List<PotionEffect> effects = new ArrayList<>(meta.getCustomEffects());
         int mixCount = meta.getPersistentDataContainer().getOrDefault(BOTTLE_MIX_COUNT, PersistentDataType.INTEGER, 1);
