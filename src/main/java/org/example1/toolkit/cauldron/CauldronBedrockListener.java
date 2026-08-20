@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -309,6 +310,12 @@ public final class CauldronBedrockListener implements Listener {
     public void onChunkLoad(ChunkLoadEvent event) {
         if (!Config.CAULDRON_BEDROCK_ENABLED) return;
         CauldronBedrock.restoreChunk(event.getChunk());
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        if (!Config.CAULDRON_BEDROCK_ENABLED) return;
+        CauldronBedrock.unloadChunk(event.getChunk());
     }
 
     private void spawnDust(Block block, Color color) {

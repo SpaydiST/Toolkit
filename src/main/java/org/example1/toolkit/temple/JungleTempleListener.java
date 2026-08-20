@@ -17,13 +17,13 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.projectiles.BlockProjectileSource;
 import org.example1.toolkit.Config;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class JungleTempleListener implements Listener {
 
     private static final int TRAP_RANGE = 16;
-    private final Map<Location, Long> recentDispenserFires = new HashMap<>();
+    private final ConcurrentHashMap<Location, Long> recentDispenserFires = new ConcurrentHashMap<>();
 
     @EventHandler
     public void onDispense(BlockDispenseEvent event) {
@@ -35,6 +35,8 @@ public final class JungleTempleListener implements Listener {
         if (!isInJungleTemple(event.getBlock())) return;
 
         recentDispenserFires.put(event.getBlock().getLocation(), System.currentTimeMillis());
+        long now = System.currentTimeMillis();
+        recentDispenserFires.entrySet().removeIf(e -> now - e.getValue() > 1000);
     }
 
     @EventHandler

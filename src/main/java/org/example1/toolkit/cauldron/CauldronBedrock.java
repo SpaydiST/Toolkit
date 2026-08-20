@@ -194,6 +194,45 @@ public final class CauldronBedrock {
         cauldronDisplays.clear();
     }
 
+    public static void unloadChunk(Chunk chunk) {
+        removeByChunk(cauldronDyeColors, chunk);
+        removeByChunk(cauldronPotions, chunk);
+        var iter = cauldronDisplays.entrySet().iterator();
+        while (iter.hasNext()) {
+            var entry = iter.next();
+            ItemDisplay display = entry.getValue();
+            if (display == null || !display.isValid()) {
+                iter.remove();
+                continue;
+            }
+            Location loc = display.getLocation();
+            if (loc.getWorld() == chunk.getWorld()
+                    && (loc.getBlockX() >> 4) == chunk.getX()
+                    && (loc.getBlockZ() >> 4) == chunk.getZ()) {
+                display.remove();
+                iter.remove();
+            }
+        }
+    }
+
+    private static void removeByChunk(Map<String, ?> map, Chunk chunk) {
+        String prefix = chunk.getWorld().getName() + ":";
+        int cx = chunk.getX() << 4;
+        int cz = chunk.getZ() << 4;
+        map.keySet().removeIf(k -> {
+            if (!k.startsWith(prefix)) return false;
+            String[] p = k.substring(prefix.length()).split(":");
+            if (p.length != 3) return false;
+            try {
+                int x = Integer.parseInt(p[0]);
+                int z = Integer.parseInt(p[2]);
+                return x >= cx && x < cx + 16 && z >= cz && z < cz + 16;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        });
+    }
+
     public static void restoreAllDisplays() {
         if (plugin == null) return;
         for (var world : plugin.getServer().getWorlds()) {

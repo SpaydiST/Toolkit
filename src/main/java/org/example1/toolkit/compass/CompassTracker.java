@@ -17,7 +17,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class CompassTracker {
 
@@ -29,6 +31,7 @@ public final class CompassTracker {
     private static NamespacedKey anchorKey;
     private static NamespacedKey lostKey;
     private static NamespacedKey cooldownKey;
+    static final Set<UUID> knownHolders = ConcurrentHashMap.newKeySet();
 
     /** Группа перезарядки только для компасов, привязанных к игроку. */
     public static final Key COOLDOWN_GROUP = Key.key("toolkit", "compass");
@@ -75,6 +78,7 @@ public final class CompassTracker {
 
     /** Привязать компас к игроку. Компас уже должен быть привязан к магниту. */
     public static void bind(ItemStack item, Player holder, Player target) {
+        knownHolders.add(holder.getUniqueId());
         Location anchor = lodestone(item);
         item.editMeta(CompassMeta.class, meta -> {
             if (anchor != null && anchor.getWorld() != null
@@ -252,13 +256,24 @@ public final class CompassTracker {
     /** Периодическая проверка целостности компасов в инвентарях игроков. */
     public static void startVerifyTask(JavaPlugin plugin) {
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
-            for (Player holder : Bukkit.getOnlinePlayers()) {
+            knownHolders.removeIf(id -> Bukkit.getPlayer(id) == null);
+            for (UUID id : knownHolders) {
+                Player holder = Bukkit.getPlayer(id);
+                if (holder == null) continue;
+                boolean anyBound = false;
                 for (int slot = 0; slot < 36; slot++) {
                     ItemStack s = holder.getInventory().getItem(slot);
-                    if (isPlayerBound(s)) update(s, holder);
+                    if (isPlayerBound(s)) {
+                        update(s, holder);
+                        anyBound = true;
+                    }
                 }
                 ItemStack off = holder.getInventory().getItemInOffHand();
-                if (isPlayerBound(off)) update(off, holder);
+                if (isPlayerBound(off)) {
+                    update(off, holder);
+                    anyBound = true;
+                }
+                if (!anyBound) knownHolders.remove(id);
             }
         }, 20L, 20L);
     }

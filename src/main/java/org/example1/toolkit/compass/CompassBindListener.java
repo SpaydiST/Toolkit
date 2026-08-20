@@ -92,11 +92,13 @@ public final class CompassBindListener implements Listener {
         Player player = event.getPlayer();
         for (ItemStack s : player.getInventory().getContents()) {
             if (s != null && s.getType() == Material.COMPASS && CompassTracker.isPlayerBound(s)) {
+                CompassTracker.knownHolders.add(player.getUniqueId());
                 CompassTracker.update(s, player);
             }
         }
         ItemStack off = player.getInventory().getItemInOffHand();
         if (off != null && off.getType() == Material.COMPASS && CompassTracker.isPlayerBound(off)) {
+            CompassTracker.knownHolders.add(player.getUniqueId());
             CompassTracker.update(off, player);
         }
     }

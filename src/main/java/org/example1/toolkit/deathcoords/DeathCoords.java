@@ -1,6 +1,8 @@
 package org.example1.toolkit.deathcoords;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Location;
@@ -76,7 +78,11 @@ public final class DeathCoords {
 
     private static Component deathComponent(int x, int y, int z, String dimension) {
         String msg = String.format(Config.MSG_DEATH_COORDS, x, y, z, dimension);
-        return Component.text(msg, NamedTextColor.RED, TextDecoration.ITALIC);
+        String coords = x + " " + y + " " + z;
+        return Component.text(msg, NamedTextColor.RED, TextDecoration.ITALIC)
+                .clickEvent(ClickEvent.copyToClipboard(coords))
+                .hoverEvent(HoverEvent.showText(
+                        Component.text("Нажми, чтобы скопировать координаты", NamedTextColor.GRAY)));
     }
 
     private static String dimensionPath(World world) {

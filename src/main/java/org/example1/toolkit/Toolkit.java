@@ -77,6 +77,8 @@ public final class Toolkit extends JavaPlugin {
         InvisibleLightRecipe.register(this);
         BannerHatRecipe.register(this);
 
+        InvisibleLightListener.loadAll(this);
+
         TimeSpeedHook timeSpeedHook = new TimeSpeedHook();
         getServer().getScheduler().runTaskLater(this, () -> {
             timeSpeedHook.init();
