@@ -41,15 +41,37 @@ public final class CompassHud {
             UUID id = CompassTracker.trackedPlayer(compass);
             Player target = id == null ? null : Bukkit.getPlayer(id);
             if (target == null || !target.isOnline()) {
-                p.sendActionBar(Msg.prefix(Lang.get(p, "compass"), NamedTextColor.GRAY)
+                Location lastKnown = CompassTracker.getLastKnown(compass);
+                Component msg = Msg.prefix(Lang.get(p, "compass"), NamedTextColor.GRAY)
                         .append(Msg.sep())
-                        .append(Msg.action(Lang.get(p, "tracking-offline"))));
+                        .append(Msg.action(Lang.get(p, "tracking-offline")));
+                if (lastKnown != null) {
+                    msg = msg.append(Msg.sep())
+                            .append(Msg.accent("X: ", NamedTextColor.RED))
+                            .append(Msg.val(String.valueOf(lastKnown.getBlockX())))
+                            .append(Msg.accent(" Y: ", NamedTextColor.GREEN))
+                            .append(Msg.val(String.valueOf(lastKnown.getBlockY())))
+                            .append(Msg.accent(" Z: ", NamedTextColor.BLUE))
+                            .append(Msg.val(String.valueOf(lastKnown.getBlockZ())));
+                }
+                p.sendActionBar(msg);
                 return;
             }
             if (CompassTracker.isLost(compass)) {
-                p.sendActionBar(Msg.prefix(Lang.get(p, "compass"), NamedTextColor.GRAY)
+                Location lastKnown = CompassTracker.getLastKnown(compass);
+                Component msg = Msg.prefix(Lang.get(p, "compass"), NamedTextColor.GRAY)
                         .append(Msg.sep())
-                        .append(Msg.action(Lang.get(p, "tracking-lost"))));
+                        .append(Msg.action(Lang.get(p, "tracking-lost")));
+                if (lastKnown != null) {
+                    msg = msg.append(Msg.sep())
+                            .append(Msg.accent("X: ", NamedTextColor.RED))
+                            .append(Msg.val(String.valueOf(lastKnown.getBlockX())))
+                            .append(Msg.accent(" Y: ", NamedTextColor.GREEN))
+                            .append(Msg.val(String.valueOf(lastKnown.getBlockY())))
+                            .append(Msg.accent(" Z: ", NamedTextColor.BLUE))
+                            .append(Msg.val(String.valueOf(lastKnown.getBlockZ())));
+                }
+                p.sendActionBar(msg);
                 return;
             }
             Component msg = Msg.prefix(Lang.get(p, "compass"), NamedTextColor.AQUA)

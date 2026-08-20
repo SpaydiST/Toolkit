@@ -27,10 +27,12 @@ public final class CompassTracker {
     private static final String KEY_ANCHOR = "magnet";
     private static final String KEY_LOST = "lost";
     private static final String KEY_COOLDOWN = "cooldown-until";
+    private static final String KEY_LAST_KNOWN = "last-known";
     private static NamespacedKey trackedKey;
     private static NamespacedKey anchorKey;
     private static NamespacedKey lostKey;
     private static NamespacedKey cooldownKey;
+    private static NamespacedKey lastKnownKey;
     static final Set<UUID> knownHolders = ConcurrentHashMap.newKeySet();
 
     /** Группа перезарядки только для компасов, привязанных к игроку. */
@@ -43,6 +45,7 @@ public final class CompassTracker {
         anchorKey = new NamespacedKey(plugin, KEY_ANCHOR);
         lostKey = new NamespacedKey(plugin, KEY_LOST);
         cooldownKey = new NamespacedKey(plugin, KEY_COOLDOWN);
+        lastKnownKey = new NamespacedKey(plugin, KEY_LAST_KNOWN);
     }
 
     public static boolean isPlayerBound(ItemStack item) {
@@ -125,7 +128,12 @@ public final class CompassTracker {
                     meta.setLodestoneTracked(false);
                 });
             }
+            clearLastKnown(item);
             return;
+        }
+
+        if (target != null && target.isOnline() && !isLost(item)) {
+            saveLastKnown(item, target);
         }
 
         item.editMeta(CompassMeta.class, meta -> {
@@ -136,7 +144,12 @@ public final class CompassTracker {
         if (spin != null) {
             item.editMeta(CompassMeta.class, meta -> meta.setLodestone(spin));
         } else {
-            item.editMeta(CompassMeta.class, CompassMeta::clearLodestone);
+            Location lastKnown = getLastKnown(item);
+            if (lastKnown != null) {
+                item.editMeta(CompassMeta.class, meta -> meta.setLodestone(lastKnown));
+            } else {
+                item.editMeta(CompassMeta.class, CompassMeta::clearLodestone);
+            }
         }
     }
 
@@ -146,6 +159,7 @@ public final class CompassTracker {
             meta.getPersistentDataContainer().remove(trackedKey);
             meta.getPersistentDataContainer().remove(anchorKey);
             meta.getPersistentDataContainer().remove(lostKey);
+            meta.getPersistentDataContainer().remove(lastKnownKey);
             meta.clearLodestone();
             meta.displayName(null);
             meta.lore(null);
@@ -177,7 +191,11 @@ public final class CompassTracker {
                 meta.setLodestone(loc);
                 meta.setLodestoneTracked(false);
             });
+            clearLastKnown(item);
         } else {
+            if (target != null && target.isOnline() && !isLost(item)) {
+                saveLastKnown(item, target);
+            }
             update(item, holder);
         }
         applyCooldownMarker(item);
@@ -222,6 +240,36 @@ public final class CompassTracker {
         long remain = until - Bukkit.getCurrentTick();
         if (remain <= 0) return 0;
         return (int) Math.ceil(remain / 20.0);
+    }
+
+    /** Сохранить последнюю известную локацию цели в PDC компаса. */
+    public static void saveLastKnown(ItemStack item, Player target) {
+        if (item == null || item.getItemMeta() == null || target == null) return;
+        Location loc = target.getLocation();
+        item.editMeta(m -> m.getPersistentDataContainer().set(lastKnownKey, PersistentDataType.STRING,
+                encode(loc.getWorld().getUID(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ())));
+    }
+
+    /** Получить последнюю известную локацию из PDC компаса. */
+    public static Location getLastKnown(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return null;
+        String s = item.getItemMeta().getPersistentDataContainer().get(lastKnownKey, PersistentDataType.STRING);
+        if (s == null) return null;
+        String[] parts = s.split(":");
+        if (parts.length != 4) return null;
+        try {
+            World w = Bukkit.getWorld(UUID.fromString(parts[0]));
+            if (w == null) return null;
+            return new Location(w, Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Очистить последнюю известную локацию. */
+    public static void clearLastKnown(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return;
+        item.editMeta(m -> m.getPersistentDataContainer().remove(lastKnownKey));
     }
 
     /** Жив ли магнит (якорь). Непроверяемое (чанк выгружен) считается живым. */

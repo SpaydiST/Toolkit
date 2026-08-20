@@ -5,8 +5,11 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.Chunk;
+import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.ItemDisplay;
@@ -18,6 +21,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.example1.toolkit.Config;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -55,6 +59,71 @@ public final class CauldronBedrock {
 
     public static void init(JavaPlugin pl) {
         plugin = pl;
+        startBoilingTask();
+    }
+
+    private static void startBoilingTask() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!Config.CAULDRON_BEDROCK_ENABLED) return;
+                for (String key : cauldronPotions.keySet()) {
+                    String[] parts = key.split(":");
+                    if (parts.length != 4) continue;
+                    try {
+                        String worldName = parts[0];
+                        int x = Integer.parseInt(parts[1]);
+                        int y = Integer.parseInt(parts[2]);
+                        int z = Integer.parseInt(parts[3]);
+                        World w = plugin.getServer().getWorld(worldName);
+                        if (w == null) continue;
+                        Block cauldron = w.getBlockAt(x, y, z);
+                        if (cauldron.getType() != Material.WATER_CAULDRON) continue;
+                        Block below = cauldron.getRelative(0, -1, 0);
+                        Material belowType = below.getType();
+                        boolean overHeat = belowType == Material.CAMPFIRE || belowType == Material.SOUL_CAMPFIRE
+                                || belowType == Material.FIRE || belowType == Material.SOUL_FIRE;
+                        if (!overHeat) continue;
+                        PotionData data = cauldronPotions.get(key);
+                        if (data == null) continue;
+                        Color color = data.mixedTypes().size() > 1
+                                ? mixPotionColors(data.mixedTypes()) : potionColor(data.type());
+                        double py = waterLevelY(getWaterLevel(cauldron)) + 0.3;
+                        w.spawnParticle(Particle.BUBBLE_POP, cauldron.getLocation().add(0.5, py, 0.5),
+                                3, 0.2, 0.05, 0.2, 0,
+                                new Particle.DustOptions(color, 1.0f));
+                        w.playSound(cauldron.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 0.3f, 1.5f);
+                    } catch (NumberFormatException ignored) {}
+                }
+                for (String key : cauldronDyeColors.keySet()) {
+                    String[] parts = key.split(":");
+                    if (parts.length != 4) continue;
+                    try {
+                        String worldName = parts[0];
+                        int x = Integer.parseInt(parts[1]);
+                        int y = Integer.parseInt(parts[2]);
+                        int z = Integer.parseInt(parts[3]);
+                        World w = plugin.getServer().getWorld(worldName);
+                        if (w == null) continue;
+                        Block cauldron = w.getBlockAt(x, y, z);
+                        if (cauldron.getType() != Material.WATER_CAULDRON) continue;
+                        if (cauldronPotions.containsKey(key)) continue;
+                        Block below = cauldron.getRelative(0, -1, 0);
+                        Material belowType = below.getType();
+                        boolean overHeat = belowType == Material.CAMPFIRE || belowType == Material.SOUL_CAMPFIRE
+                                || belowType == Material.FIRE || belowType == Material.SOUL_FIRE;
+                        if (!overHeat) continue;
+                        Color color = cauldronDyeColors.get(key);
+                        if (color == null) continue;
+                        double py = waterLevelY(getWaterLevel(cauldron)) + 0.3;
+                        w.spawnParticle(Particle.BUBBLE_POP, cauldron.getLocation().add(0.5, py, 0.5),
+                                3, 0.2, 0.05, 0.2, 0,
+                                new Particle.DustOptions(color, 1.0f));
+                        w.playSound(cauldron.getLocation(), Sound.BLOCK_BUBBLE_COLUMN_BUBBLE_POP, 0.3f, 1.5f);
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+        }.runTaskTimer(plugin, 20L, 20L);
     }
 
     private static String key(Location loc) {
@@ -638,11 +707,24 @@ public final class CauldronBedrock {
         return !meta.getPatterns().isEmpty();
     }
 
-    public static void cleanBanner(ItemStack item) {
-        if (item.getItemMeta() instanceof BannerMeta meta) {
-            meta.setPatterns(new ArrayList<>());
-            item.setItemMeta(meta);
-        }
+    /**
+     * Убирает верхний слой узора флага (Bedrock-стиль: по одному слою за клик).
+     * Возвращает true, если слой был снят.
+     */
+    public static boolean cleanBanner(ItemStack item) {
+        if (!(item.getItemMeta() instanceof BannerMeta meta)) return false;
+        List<Pattern> patterns = new ArrayList<>(meta.getPatterns());
+        if (patterns.isEmpty()) return false;
+        patterns.removeLast();
+        meta.setPatterns(patterns);
+        item.setItemMeta(meta);
+        return true;
+    }
+
+    /** Сколько слоёв узора осталось на флаге. */
+    public static int bannerLayers(ItemStack item) {
+        if (!(item.getItemMeta() instanceof BannerMeta meta)) return 0;
+        return meta.getPatterns().size();
     }
 
     public static boolean isDyedShulker(ItemStack item) {

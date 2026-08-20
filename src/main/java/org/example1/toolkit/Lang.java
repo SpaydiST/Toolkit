@@ -86,6 +86,7 @@ public final class Lang {
         fallback("armor-potioned", () -> Config.MSG_ARMOR_POTIONED);
         fallback("armor-cleaned", () -> Config.MSG_ARMOR_CLEANED);
         fallback("banner-cleaned", () -> Config.MSG_BANNER_CLEANED);
+        fallback("banner-layer", () -> Config.MSG_BANNER_LAYER);
         fallback("shulker-cleaned", () -> Config.MSG_SHULKER_CLEANED);
         fallback("mixed", () -> Config.MSG_MIXED);
         fallback("level", () -> Config.MSG_LEVEL);

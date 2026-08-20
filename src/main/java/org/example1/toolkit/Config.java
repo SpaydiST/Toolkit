@@ -61,6 +61,7 @@ public final class Config {
     public static String MSG_ARMOR_POTIONED = "Броня пропитана зельем";
     public static String MSG_ARMOR_CLEANED = "Броня очищена";
     public static String MSG_BANNER_CLEANED = "Флаг очищен";
+    public static String MSG_BANNER_LAYER = "Узор снят";
     public static String MSG_SHULKER_CLEANED = "Шалкер очищен";
     public static String MSG_MIXED = "Смешанное";
     public static String MSG_LEVEL = "Ур.";
@@ -160,6 +161,7 @@ public final class Config {
         MSG_ARMOR_POTIONED = c.getString("messages.armor-potioned", MSG_ARMOR_POTIONED);
         MSG_ARMOR_CLEANED = c.getString("messages.armor-cleaned", MSG_ARMOR_CLEANED);
         MSG_BANNER_CLEANED = c.getString("messages.banner-cleaned", MSG_BANNER_CLEANED);
+        MSG_BANNER_LAYER = c.getString("messages.banner-layer", MSG_BANNER_LAYER);
         MSG_SHULKER_CLEANED = c.getString("messages.shulker-cleaned", MSG_SHULKER_CLEANED);
         MSG_MIXED = c.getString("messages.mixed", MSG_MIXED);
         MSG_LEVEL = c.getString("messages.level", MSG_LEVEL);

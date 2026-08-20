@@ -337,10 +337,20 @@ public final class CauldronBedrockListener implements Listener {
         } else {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
-        Msg.of(player,
-                Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
-                Msg.sep(),
-                Msg.action(Lang.get(player, "banner-cleaned")));
+        int remaining = CauldronBedrock.bannerLayers(item);
+        if (remaining > 0) {
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "banner-layer")),
+                    Msg.sep(),
+                    Msg.val(String.valueOf(remaining)));
+        } else {
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.GREEN),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "banner-cleaned")));
+        }
     }
 
     private void handleCleanShulker(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
