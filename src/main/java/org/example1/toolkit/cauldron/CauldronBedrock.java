@@ -216,7 +216,8 @@ public final class CauldronBedrock {
         }
 
         int newMixCount = Math.min(existing.mixCount() + 1, MAX_MIX);
-        PotionEffect bonus = rollBonusEffect(negCount, posCount, newMixCount, allEffects.size());
+        int avgAmplifier = computeAvgAmplifier(allEffects);
+        PotionEffect bonus = rollBonusEffect(negCount, posCount, newMixCount, allEffects.size(), avgAmplifier);
         if (bonus != null) {
             allEffects.add(bonus);
         }
@@ -230,7 +231,14 @@ public final class CauldronBedrock {
         return effects;
     }
 
-    private static PotionEffect rollBonusEffect(int negCount, int posCount, int mixCount, int totalEffects) {
+    private static int computeAvgAmplifier(List<PotionEffect> effects) {
+        if (effects.isEmpty()) return 0;
+        int sum = 0;
+        for (PotionEffect e : effects) sum += e.getAmplifier();
+        return sum / effects.size();
+    }
+
+    private static PotionEffect rollBonusEffect(int negCount, int posCount, int mixCount, int totalEffects, int avgAmplifier) {
         double chance = mixCount * 0.25;
         ThreadLocalRandom rng = ThreadLocalRandom.current();
         if (rng.nextDouble() > chance) return null;
@@ -238,9 +246,13 @@ public final class CauldronBedrock {
         if (totalEffects > 5) {
             PotionEffectType[] negatives = {
                     PotionEffectType.NAUSEA, PotionEffectType.SLOWNESS,
-                    PotionEffectType.WEAKNESS, PotionEffectType.POISON
+                    PotionEffectType.WEAKNESS, PotionEffectType.POISON,
+                    PotionEffectType.BLINDNESS, PotionEffectType.DARKNESS
             };
-            return new PotionEffect(negatives[rng.nextInt(negatives.length)], 200, 0);
+            PotionEffectType type = negatives[rng.nextInt(negatives.length)];
+            int amplifier = Math.min(avgAmplifier, 2);
+            int duration = 200 + avgAmplifier * 100;
+            return new PotionEffect(type, duration, amplifier);
         }
 
         if (negCount > posCount) {
