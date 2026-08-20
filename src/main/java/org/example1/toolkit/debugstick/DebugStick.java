@@ -116,4 +116,12 @@ public final class DebugStick {
             return null;
         }
     }
+
+    public static void clearCopiedState(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return;
+        item.editMeta(meta -> {
+            meta.getPersistentDataContainer().remove(copiedTypeKey);
+            meta.getPersistentDataContainer().remove(copiedStateKey);
+        });
+    }
 }
