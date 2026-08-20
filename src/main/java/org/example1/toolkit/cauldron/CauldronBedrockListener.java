@@ -150,14 +150,17 @@ public final class CauldronBedrockListener implements Listener {
 
         event.setCancelled(true);
 
-        int arrowsToTip = item.getAmount();
+        int total = item.getAmount();
+        int maxTippable = (total / 3) * 3;
+        int arrowsToTip = Math.min(maxTippable, level * 3);
+        if (arrowsToTip <= 0) return;
 
         if (player.getGameMode() != GameMode.CREATIVE) {
             ItemStack tipped = new ItemStack(Material.TIPPED_ARROW, arrowsToTip);
             PotionMeta arrowMeta = (PotionMeta) tipped.getItemMeta();
             arrowMeta.setBasePotionType(data.type());
             tipped.setItemMeta(arrowMeta);
-            item.setAmount(0);
+            item.setAmount(total - arrowsToTip);
             if (player.getInventory().firstEmpty() == -1) {
                 player.getWorld().dropItemNaturally(player.getLocation(), tipped);
             } else {
@@ -165,9 +168,15 @@ public final class CauldronBedrockListener implements Listener {
             }
         }
 
-        CauldronBedrock.setWaterLevel(block, 0);
-        CauldronBedrock.removeAll(block);
-        player.sendActionBar(Component.text("Стрелы пропитаны зельем! (" + arrowsToTip + ")", NamedTextColor.LIGHT_PURPLE));
+        int levelsUsed = arrowsToTip / 3;
+        int newLevel = level - levelsUsed;
+        CauldronBedrock.setWaterLevel(block, newLevel);
+        if (newLevel <= 0) {
+            CauldronBedrock.removeAll(block);
+        } else {
+            CauldronBedrock.updateDisplayLevel(block, newLevel);
+        }
+        player.sendActionBar(Component.text("Стрелы пропитаны! " + arrowsToTip + " шт. (уровень: " + newLevel + "/3)", NamedTextColor.LIGHT_PURPLE));
     }
 
     private void handleDye(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
