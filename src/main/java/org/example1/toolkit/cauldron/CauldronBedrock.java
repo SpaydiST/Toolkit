@@ -84,7 +84,7 @@ public final class CauldronBedrock {
         String k = key(block.getLocation());
         if (data != null) {
             cauldronPotions.put(k, data);
-            savePotionPDC(block, data.type().name());
+            savePotionPDC(block, data);
         } else {
             cauldronPotions.remove(k);
             clearPotionPDC(block);
@@ -371,8 +371,8 @@ public final class CauldronBedrock {
                     cauldronDyeColors.put(mapKey, color);
                     spawnColoredDisplay(block, color, level);
                 } catch (NumberFormatException ignored) {}
-            } else if (keyStr.startsWith("pot_")) {
-                String coords = keyStr.substring(4);
+            } else if (keyStr.startsWith("pot_type_")) {
+                String coords = keyStr.substring(9);
                 String[] parts = coords.split("_");
                 if (parts.length != 3) continue;
                 try {
@@ -386,10 +386,28 @@ public final class CauldronBedrock {
                     String typeName = pdc.get(key, PersistentDataType.STRING);
                     if (typeName == null) continue;
                     PotionType type = PotionType.valueOf(typeName);
-                    PotionData data = new PotionData(type, List.of());
+                    int mixCount = pdc.getOrDefault(new NamespacedKey(plugin, "pot_mix_" + coords), PersistentDataType.INTEGER, 1);
+                    String typesStr = pdc.getOrDefault(new NamespacedKey(plugin, "pot_types_" + coords), PersistentDataType.STRING, typeName);
+                    List<PotionType> mixedTypes = java.util.Arrays.stream(typesStr.split(","))
+                            .map(s -> { try { return PotionType.valueOf(s.trim()); } catch (Exception e) { return null; } })
+                            .filter(java.util.Objects::nonNull)
+                            .toList();
+                    String fxStr = pdc.getOrDefault(new NamespacedKey(plugin, "pot_fx_" + coords), PersistentDataType.STRING, "");
+                    List<PotionEffect> customFx = new ArrayList<>();
+                    if (!fxStr.isEmpty()) {
+                        for (String fx : fxStr.split(",")) {
+                            String[] p = fx.split(":");
+                            if (p.length != 3) continue;
+                            PotionEffectType et = PotionEffectType.getByName(p[0]);
+                            if (et == null) continue;
+                            customFx.add(new PotionEffect(et, Integer.parseInt(p[1]), Integer.parseInt(p[2])));
+                        }
+                    }
+                    PotionData data = new PotionData(type, customFx, Math.max(1, Math.min(mixCount, MAX_MIX)), mixedTypes);
                     cauldronPotions.put(mapKey, data);
                     int level = getWaterLevel(block);
-                    spawnColoredDisplay(block, potionColor(type), level);
+                    Color color = mixedTypes.size() > 1 ? mixPotionColors(mixedTypes) : potionColor(type);
+                    spawnColoredDisplay(block, color, level);
                 } catch (Exception ignored) {}
             }
         }
@@ -652,20 +670,31 @@ public final class CauldronBedrock {
         pdc.remove(new NamespacedKey(plugin, "dye_" + coords));
     }
 
-    private static void savePotionPDC(Block block, String typeName) {
+    private static void savePotionPDC(Block block, PotionData data) {
         if (plugin == null) return;
         Chunk chunk = block.getChunk();
         PersistentDataContainer pdc = chunk.getPersistentDataContainer();
-        String coords = block.getX() + "_" + block.getY() + "_" + block.getZ();
-        NamespacedKey key = new NamespacedKey(plugin, "pot_" + coords);
-        pdc.set(key, PersistentDataType.STRING, typeName);
+        String c = block.getX() + "_" + block.getY() + "_" + block.getZ();
+        pdc.set(new NamespacedKey(plugin, "pot_type_" + c), PersistentDataType.STRING, data.type().name());
+        pdc.set(new NamespacedKey(plugin, "pot_mix_" + c), PersistentDataType.INTEGER, data.mixCount());
+        pdc.set(new NamespacedKey(plugin, "pot_types_" + c), PersistentDataType.STRING,
+                String.join(",", data.mixedTypes().stream().map(Enum::name).toList()));
+        StringBuilder fx = new StringBuilder();
+        for (PotionEffect effect : data.customEffects()) {
+            if (!fx.isEmpty()) fx.append(",");
+            fx.append(effect.getType().getName()).append(":").append(effect.getDuration()).append(":").append(effect.getAmplifier());
+        }
+        pdc.set(new NamespacedKey(plugin, "pot_fx_" + c), PersistentDataType.STRING, fx.toString());
     }
 
     private static void clearPotionPDC(Block block) {
         if (plugin == null) return;
         Chunk chunk = block.getChunk();
         PersistentDataContainer pdc = chunk.getPersistentDataContainer();
-        String coords = block.getX() + "_" + block.getY() + "_" + block.getZ();
-        pdc.remove(new NamespacedKey(plugin, "pot_" + coords));
+        String c = block.getX() + "_" + block.getY() + "_" + block.getZ();
+        pdc.remove(new NamespacedKey(plugin, "pot_type_" + c));
+        pdc.remove(new NamespacedKey(plugin, "pot_mix_" + c));
+        pdc.remove(new NamespacedKey(plugin, "pot_types_" + c));
+        pdc.remove(new NamespacedKey(plugin, "pot_fx_" + c));
     }
 }
