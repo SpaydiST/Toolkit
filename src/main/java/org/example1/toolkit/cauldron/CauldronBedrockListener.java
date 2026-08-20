@@ -55,6 +55,8 @@ public final class CauldronBedrockListener implements Listener {
             handlePotion(event, player, block, item, level);
         } else if (item.getType() == Material.GLASS_BOTTLE && isWaterCauldron) {
             handleBottleTake(event, player, block, item, level);
+        } else if (item.getType() == Material.ARROW && isWaterCauldron) {
+            handleArrow(event, player, block, item, level);
         } else if (CauldronBedrock.isDye(item) && isWaterCauldron) {
             handleDye(event, player, block, item, level);
         } else if (CauldronBedrock.isLeatherArmor(item) && isWaterCauldron) {
@@ -139,6 +141,38 @@ public final class CauldronBedrockListener implements Listener {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
         player.sendActionBar(Component.text("Зелье забрано из котла", NamedTextColor.LIGHT_PURPLE));
+    }
+
+    private void handleArrow(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
+        CauldronBedrock.PotionData data = CauldronBedrock.getPotion(block);
+        if (data == null) return;
+        if (level <= 0) return;
+
+        event.setCancelled(true);
+
+        int arrowsToTip = Math.min(item.getAmount(), level);
+
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            ItemStack tipped = new ItemStack(Material.TIPPED_ARROW, arrowsToTip);
+            PotionMeta arrowMeta = (PotionMeta) tipped.getItemMeta();
+            arrowMeta.setBasePotionType(data.type());
+            tipped.setItemMeta(arrowMeta);
+            item.setAmount(item.getAmount() - arrowsToTip);
+            if (player.getInventory().firstEmpty() == -1) {
+                player.getWorld().dropItemNaturally(player.getLocation(), tipped);
+            } else {
+                player.getInventory().addItem(tipped);
+            }
+        }
+
+        int newLevel = level - arrowsToTip;
+        CauldronBedrock.setWaterLevel(block, newLevel);
+        if (newLevel <= 0) {
+            CauldronBedrock.removeAll(block);
+        } else {
+            CauldronBedrock.updateDisplayLevel(block, newLevel);
+        }
+        player.sendActionBar(Component.text("Стрелы пропитаны зельем! (" + arrowsToTip + ")", NamedTextColor.LIGHT_PURPLE));
     }
 
     private void handleDye(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
