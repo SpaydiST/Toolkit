@@ -23,11 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Механика как в моде debugStickSurvival:
- * - ПКМ по блоку — изменить значение выбранного свойства (шифт — в обратную сторону).
- * - ЛКМ по блоку — выбрать следующее свойство (шифт — предыдущее), блок не ломается.
- */
 public final class DebugStickListener implements Listener {
 
     private final EditPolicy policy;
@@ -54,15 +49,44 @@ public final class DebugStickListener implements Listener {
         Player player = event.getPlayer();
         boolean forward = !player.isSneaking();
 
-        if (action == Action.RIGHT_CLICK_BLOCK) {
-            if (modifyValue(player, block, forward)) {
-                DebugStick.consumeUse(item);
-                if (!DebugStick.isDebugStick(item)) {
-                    player.sendActionBar(Component.text(Lang.get(player, "stick-broken"), NamedTextColor.RED));
-                }
+        if (action == Action.LEFT_CLICK_BLOCK) {
+            if (player.isSneaking()) {
+                DebugStick.saveState(item, block);
+                player.sendActionBar(Component.text(
+                        Lang.get(player, "stick-state-copied").formatted(block.getType().name().toLowerCase()),
+                        NamedTextColor.GREEN));
+            } else {
+                selectProperty(player, block, forward);
             }
         } else {
-            selectProperty(player, block, forward);
+            if (DebugStick.hasCopiedState(item)
+                    && block.getType().name().equals(DebugStick.getCopiedType(item))) {
+                applyState(player, block, item);
+            } else {
+                if (modifyValue(player, block, forward)) {
+                    DebugStick.consumeUse(item);
+                    if (!DebugStick.isDebugStick(item)) {
+                        player.sendActionBar(Component.text(Lang.get(player, "stick-broken"), NamedTextColor.RED));
+                    }
+                }
+            }
+        }
+    }
+
+    private void applyState(Player player, Block block, ItemStack item) {
+        BlockData newData = DebugStick.getCopiedState(item);
+        if (newData == null) {
+            player.sendActionBar(Component.text(Lang.get(player, "stick-state-fail"), NamedTextColor.RED));
+            return;
+        }
+        block.setBlockData(newData);
+        DebugStick.consumeUse(item);
+        if (!DebugStick.isDebugStick(item)) {
+            player.sendActionBar(Component.text(Lang.get(player, "stick-broken"), NamedTextColor.RED));
+        } else {
+            player.sendActionBar(Component.text(
+                    Lang.get(player, "stick-state-applied").formatted(block.getType().name().toLowerCase()),
+                    NamedTextColor.GREEN));
         }
     }
 
@@ -84,7 +108,6 @@ public final class DebugStickListener implements Listener {
         }
     }
 
-    /** Выбрать следующее/предыдущее редактируемое свойство блока. */
     private void selectProperty(Player player, Block block, boolean forward) {
         Map<String, List<String>> editable = editable(block);
         List<String> names = new ArrayList<>(editable.keySet());
@@ -109,7 +132,6 @@ public final class DebugStickListener implements Listener {
                 NamedTextColor.GRAY));
     }
 
-    /** Изменить значение выбранного свойства. Возвращает true, если блок изменён. */
     private boolean modifyValue(Player player, Block block, boolean forward) {
         Map<String, List<String>> editable = editable(block);
         if (editable.isEmpty()) {
@@ -171,7 +193,6 @@ public final class DebugStickListener implements Listener {
         return out;
     }
 
-    /** Выбор свойства запоминается на игрока и тип блока (как в моде). */
     private static String selectionKey(Player p, Block b) {
         return p.getUniqueId() + ":" + b.getType().getKey();
     }

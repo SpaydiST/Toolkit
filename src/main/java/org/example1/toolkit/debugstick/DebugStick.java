@@ -1,23 +1,23 @@
 package org.example1.toolkit.debugstick;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
 
-/**
- * Дебагстик — предмет minecraft:debug_stick с маркером в PDC
- * и ограниченным числом использований. Название — ванильное (переводится
- * языком клиента), остаток использований показывается как прочность.
- */
 public final class DebugStick {
 
     private static NamespacedKey markerKey;
     private static NamespacedKey usesKey;
     private static NamespacedKey maxUsesKey;
+    private static NamespacedKey copiedTypeKey;
+    private static NamespacedKey copiedStateKey;
 
     private DebugStick() {}
 
@@ -25,6 +25,8 @@ public final class DebugStick {
         markerKey = new NamespacedKey(plugin, "debug-stick");
         usesKey = new NamespacedKey(plugin, "debug-stick-uses");
         maxUsesKey = new NamespacedKey(plugin, "debug-stick-max-uses");
+        copiedTypeKey = new NamespacedKey(plugin, "debug-stick-copied-type");
+        copiedStateKey = new NamespacedKey(plugin, "debug-stick-copied-state");
     }
 
     public static boolean isDebugStick(ItemStack item) {
@@ -45,14 +47,12 @@ public final class DebugStick {
         return u == null ? Config.DEBUG_STICK_USES : u;
     }
 
-    /** Создать предмет дебагстика с указанным числом использований. */
     public static ItemStack createCrafted(int uses) {
         ItemStack item = new ItemStack(Material.DEBUG_STICK);
         mark(item, uses);
         return item;
     }
 
-    /** Пометить предмет как дебагстик с указанным числом использований. */
     public static void mark(ItemStack item, int uses) {
         int u = Math.max(1, uses);
         item.editMeta(meta -> {
@@ -65,7 +65,6 @@ public final class DebugStick {
         });
     }
 
-    /** Снять одно использование; если осталось 0 — предмет ломается в обычную палку. */
     public static void consumeUse(ItemStack item) {
         int left = usesLeft(item) - 1;
         if (left <= 0) {
@@ -73,6 +72,8 @@ public final class DebugStick {
                 meta.getPersistentDataContainer().remove(markerKey);
                 meta.getPersistentDataContainer().remove(usesKey);
                 meta.getPersistentDataContainer().remove(maxUsesKey);
+                meta.getPersistentDataContainer().remove(copiedTypeKey);
+                meta.getPersistentDataContainer().remove(copiedStateKey);
                 meta.displayName(null);
                 meta.lore(null);
             });
@@ -86,5 +87,33 @@ public final class DebugStick {
             meta.lore(java.util.List.of(
                     Component.translatable("item.durability", Component.text(finalUses), Component.text(max))));
         });
+    }
+
+    public static void saveState(ItemStack item, Block block) {
+        item.editMeta(meta -> {
+            meta.getPersistentDataContainer().set(copiedTypeKey, PersistentDataType.STRING, block.getType().name());
+            meta.getPersistentDataContainer().set(copiedStateKey, PersistentDataType.STRING, block.getBlockData().getAsString());
+        });
+    }
+
+    public static boolean hasCopiedState(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return false;
+        return item.getItemMeta().getPersistentDataContainer().has(copiedTypeKey, PersistentDataType.STRING);
+    }
+
+    public static String getCopiedType(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return null;
+        return item.getItemMeta().getPersistentDataContainer().get(copiedTypeKey, PersistentDataType.STRING);
+    }
+
+    public static BlockData getCopiedState(ItemStack item) {
+        if (item == null || item.getItemMeta() == null) return null;
+        String str = item.getItemMeta().getPersistentDataContainer().get(copiedStateKey, PersistentDataType.STRING);
+        if (str == null) return null;
+        try {
+            return Bukkit.createBlockData(str);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

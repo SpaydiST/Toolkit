@@ -19,6 +19,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.joml.Matrix4f;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.Set;
 
 public final class CauldronBedrock {
 
@@ -38,10 +41,15 @@ public final class CauldronBedrock {
     private static final int DEFAULT_LEATHER_B = 56;
     private static final NamespacedKey ITEM_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_water");
     private static final NamespacedKey POTION_MODEL_KEY = new NamespacedKey("toolkit", "cauldron_potion");
+    private static final int MAX_MIX = 3;
 
     private static JavaPlugin plugin;
 
-    public record PotionData(PotionType type, List<PotionEffect> customEffects) {}
+    public record PotionData(PotionType type, List<PotionEffect> customEffects, int mixCount, List<PotionType> mixedTypes) {
+        public PotionData(PotionType type, List<PotionEffect> customEffects) {
+            this(type, customEffects, 1, List.of(type));
+        }
+    }
 
     private CauldronBedrock() {}
 
@@ -90,6 +98,102 @@ public final class CauldronBedrock {
         clearDyePDC(block);
         clearPotionPDC(block);
         removeDisplay(block);
+    }
+
+    private static final Set<PotionType> NEGATIVE_TYPES = Set.of(
+            PotionType.POISON, PotionType.LONG_POISON, PotionType.STRONG_POISON,
+            PotionType.HARMING, PotionType.STRONG_HARMING,
+            PotionType.WEAKNESS, PotionType.LONG_WEAKNESS,
+            PotionType.SLOWNESS, PotionType.LONG_SLOWNESS, PotionType.STRONG_SLOWNESS,
+            PotionType.INFESTED
+    );
+
+    private static final Set<PotionType> POSITIVE_TYPES = Set.of(
+            PotionType.FIRE_RESISTANCE, PotionType.LONG_FIRE_RESISTANCE,
+            PotionType.SWIFTNESS, PotionType.LONG_SWIFTNESS, PotionType.STRONG_SWIFTNESS,
+            PotionType.HEALING, PotionType.STRONG_HEALING,
+            PotionType.REGENERATION, PotionType.LONG_REGENERATION, PotionType.STRONG_REGENERATION,
+            PotionType.STRENGTH, PotionType.LONG_STRENGTH, PotionType.STRONG_STRENGTH,
+            PotionType.NIGHT_VISION, PotionType.LONG_NIGHT_VISION,
+            PotionType.WATER_BREATHING, PotionType.LONG_WATER_BREATHING,
+            PotionType.LEAPING, PotionType.LONG_LEAPING, PotionType.STRONG_LEAPING,
+            PotionType.INVISIBILITY, PotionType.LONG_INVISIBILITY,
+            PotionType.SLOW_FALLING, PotionType.LONG_SLOW_FALLING,
+            PotionType.LUCK, PotionType.TURTLE_MASTER, PotionType.LONG_TURTLE_MASTER, PotionType.STRONG_TURTLE_MASTER
+    );
+
+    public static boolean canMix(PotionData existing, PotionData incoming) {
+        if (existing.mixCount() >= MAX_MIX) return false;
+        return true;
+    }
+
+    public static PotionData mixPotions(PotionData existing, PotionData incoming) {
+        List<PotionEffect> allEffects = new ArrayList<>(getAllEffects(existing));
+        allEffects.addAll(getAllEffects(incoming));
+
+        List<PotionType> allTypes = new ArrayList<>(existing.mixedTypes());
+        if (!allTypes.contains(incoming.type())) {
+            allTypes.add(incoming.type());
+        }
+
+        int negCount = 0;
+        int posCount = 0;
+        for (PotionType t : allTypes) {
+            if (NEGATIVE_TYPES.contains(t)) negCount++;
+            else if (POSITIVE_TYPES.contains(t)) posCount++;
+        }
+
+        int newMixCount = Math.min(existing.mixCount() + 1, MAX_MIX);
+        PotionEffect bonus = rollBonusEffect(negCount, posCount, newMixCount);
+        if (bonus != null) {
+            allEffects.add(bonus);
+        }
+
+        return new PotionData(existing.type(), allEffects, newMixCount, allTypes);
+    }
+
+    public static List<PotionEffect> getAllEffects(PotionData data) {
+        List<PotionEffect> effects = new ArrayList<>(potionEffects(data.type()));
+        effects.addAll(data.customEffects());
+        return effects;
+    }
+
+    private static PotionEffect rollBonusEffect(int negCount, int posCount, int mixCount) {
+        double chance = mixCount * 0.25;
+        ThreadLocalRandom rng = ThreadLocalRandom.current();
+        if (rng.nextDouble() > chance) return null;
+
+        if (negCount > posCount) {
+            PotionEffectType[] positives = {
+                    PotionEffectType.SPEED, PotionEffectType.STRENGTH,
+                    PotionEffectType.REGENERATION, PotionEffectType.RESISTANCE
+            };
+            return new PotionEffect(positives[rng.nextInt(positives.length)], 400, 0);
+        } else if (posCount > negCount) {
+            PotionEffectType[] negatives = {
+                    PotionEffectType.NAUSEA, PotionEffectType.SLOWNESS,
+                    PotionEffectType.WEAKNESS, PotionEffectType.POISON
+            };
+            return new PotionEffect(negatives[rng.nextInt(negatives.length)], 200, 0);
+        } else {
+            PotionEffectType[] all = {
+                    PotionEffectType.SPEED, PotionEffectType.NAUSEA,
+                    PotionEffectType.REGENERATION, PotionEffectType.WEAKNESS
+            };
+            return new PotionEffect(all[rng.nextInt(all.length)], 300, 0);
+        }
+    }
+
+    public static Color mixPotionColors(List<PotionType> types) {
+        if (types.isEmpty()) return potionColor(PotionType.WATER);
+        int r = 0, g = 0, b = 0;
+        for (PotionType t : types) {
+            Color c = potionColor(t);
+            r += c.getRed();
+            g += c.getGreen();
+            b += c.getBlue();
+        }
+        return Color.fromRGB(r / types.size(), g / types.size(), b / types.size());
     }
 
     public static Color mixColors(Color existing, Color add) {

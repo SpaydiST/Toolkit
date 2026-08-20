@@ -27,6 +27,7 @@ import org.bukkit.potion.PotionType;
 import org.example1.toolkit.Config;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -92,17 +93,31 @@ public final class CauldronBedrockListener implements Listener {
         if (level >= 3) return;
 
         CauldronBedrock.PotionData existing = CauldronBedrock.getPotion(block);
-        if (existing != null && existing.type() != data.type()) {
-            player.sendActionBar(Component.text("Нельзя смешивать разные зелья!", NamedTextColor.RED));
-            return;
+
+        CauldronBedrock.PotionData result;
+        if (existing != null) {
+            if (!CauldronBedrock.canMix(existing, data)) {
+                player.sendActionBar(Component.text("Котёл уже содержит 3 зелья!", NamedTextColor.RED));
+                return;
+            }
+            if (existing.type() == data.type() && existing.mixCount() == 1) {
+                result = new CauldronBedrock.PotionData(data.type(), List.of(), 1, List.of(data.type()));
+            } else {
+                result = CauldronBedrock.mixPotions(existing, data);
+                player.sendActionBar(Component.text("Зелья смешаны! (" + result.mixCount() + "/3)", NamedTextColor.LIGHT_PURPLE));
+            }
+        } else {
+            result = data;
         }
 
-        CauldronBedrock.setPotion(block, data);
+        CauldronBedrock.setPotion(block, result);
         CauldronBedrock.setDyeColor(block, null);
         int newLevel = Math.min(level + 1, 3);
         CauldronBedrock.setWaterLevel(block, newLevel);
 
-        Color color = CauldronBedrock.potionColor(data.type());
+        Color color = result.mixedTypes().size() > 1
+                ? CauldronBedrock.mixPotionColors(result.mixedTypes())
+                : CauldronBedrock.potionColor(result.type());
         CauldronBedrock.spawnColoredDisplay(block, color, newLevel);
 
         if (player.getGameMode() != GameMode.CREATIVE) {
@@ -110,7 +125,9 @@ public final class CauldronBedrockListener implements Listener {
             item.editMeta(m -> {});
         }
 
-        player.sendActionBar(Component.text("Зелье добавлено в котёл", NamedTextColor.LIGHT_PURPLE));
+        if (existing == null || existing.type() == data.type()) {
+            player.sendActionBar(Component.text("Зелье добавлено в котёл", NamedTextColor.LIGHT_PURPLE));
+        }
         spawnDust(block, color);
     }
 
@@ -124,7 +141,14 @@ public final class CauldronBedrockListener implements Listener {
         if (player.getGameMode() != GameMode.CREATIVE) {
             ItemStack potion = new ItemStack(Material.POTION);
             PotionMeta meta = (PotionMeta) potion.getItemMeta();
-            meta.setBasePotionType(data.type());
+            if (data.mixCount() > 1) {
+                meta.setBasePotionType(PotionType.AWKWARD);
+                for (PotionEffect effect : CauldronBedrock.getAllEffects(data)) {
+                    meta.addCustomEffect(effect, true);
+                }
+            } else {
+                meta.setBasePotionType(data.type());
+            }
             potion.setItemMeta(meta);
             item.setAmount(item.getAmount() - 1);
             if (player.getInventory().firstEmpty() == -1) {
@@ -151,14 +175,23 @@ public final class CauldronBedrockListener implements Listener {
 
         event.setCancelled(true);
 
-        int maxTippable = level * 21;
+        boolean isMixed = data.mixCount() > 1;
+        int perLevel = isMixed ? 16 : 21;
+        int maxTippable = level * perLevel;
         int arrowsToTip = Math.min(item.getAmount(), maxTippable);
         if (arrowsToTip <= 0) return;
 
         if (player.getGameMode() != GameMode.CREATIVE) {
             ItemStack tipped = new ItemStack(Material.TIPPED_ARROW, arrowsToTip);
             PotionMeta arrowMeta = (PotionMeta) tipped.getItemMeta();
-            arrowMeta.setBasePotionType(data.type());
+            if (isMixed) {
+                arrowMeta.setBasePotionType(PotionType.AWKWARD);
+                for (PotionEffect effect : CauldronBedrock.getAllEffects(data)) {
+                    arrowMeta.addCustomEffect(effect, true);
+                }
+            } else {
+                arrowMeta.setBasePotionType(data.type());
+            }
             tipped.setItemMeta(arrowMeta);
             item.setAmount(item.getAmount() - arrowsToTip);
             if (player.getInventory().firstEmpty() == -1) {
@@ -168,7 +201,7 @@ public final class CauldronBedrockListener implements Listener {
             }
         }
 
-        int levelsUsed = (int) Math.ceil(arrowsToTip / 21.0);
+        int levelsUsed = (int) Math.ceil((double) arrowsToTip / perLevel);
         int newLevel = level - levelsUsed;
         CauldronBedrock.setWaterLevel(block, newLevel);
         if (newLevel <= 0) {
@@ -176,7 +209,8 @@ public final class CauldronBedrockListener implements Listener {
         } else {
             CauldronBedrock.updateDisplayLevel(block, newLevel);
         }
-        player.sendActionBar(Component.text("Стрелы пропитаны! " + arrowsToTip + " шт. (уровень: " + Math.max(newLevel, 0) + "/3)", NamedTextColor.LIGHT_PURPLE));
+        String typeLabel = isMixed ? " (смешанное)" : "";
+        player.sendActionBar(Component.text("Стрелы пропитаны! " + arrowsToTip + " шт. (уровень: " + Math.max(newLevel, 0) + "/3)" + typeLabel, NamedTextColor.LIGHT_PURPLE));
     }
 
     private void handleDye(PlayerInteractEvent event, Player player, Block block, ItemStack item, int level) {
