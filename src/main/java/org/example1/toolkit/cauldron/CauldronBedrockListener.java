@@ -108,7 +108,7 @@ public final class CauldronBedrockListener implements Listener {
 
         CauldronBedrock.PotionData result;
         if (existing != null) {
-            if (!CauldronBedrock.canMix(existing, data)) {
+            if (!CauldronBedrock.canMix(existing, data, level)) {
                 Msg.of(player,
                         Msg.prefix(Lang.get(player, "cauldron"), NamedTextColor.RED),
                         Msg.sep(),

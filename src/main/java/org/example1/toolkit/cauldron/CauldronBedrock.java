@@ -194,8 +194,8 @@ public final class CauldronBedrock {
             PotionType.OOZING, PotionType.WEAVING, PotionType.WIND_CHARGED
     );
 
-    public static boolean canMix(PotionData existing, PotionData incoming) {
-        if (existing.mixCount() >= MAX_MIX) return false;
+    public static boolean canMix(PotionData existing, PotionData incoming, int level) {
+        if (level >= MAX_MIX) return false;
         return true;
     }
 
