@@ -91,7 +91,6 @@ public final class DebugStickListener implements Listener {
             return;
         }
         block.setBlockData(newData);
-        DebugStick.clearCopiedState(item);
         DebugStick.consumeUse(item);
         if (!DebugStick.isDebugStick(item)) {
             Msg.of(player,
