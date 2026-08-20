@@ -4,7 +4,7 @@
     "model": "toolkit:item/cauldron_water",
     "tints": [
       {
-        "type": "minecraft:dye",
+        "type": "minecraft:potion",
         "default": 16777215
       }
     ]

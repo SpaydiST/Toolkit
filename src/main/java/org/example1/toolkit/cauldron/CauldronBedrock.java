@@ -122,8 +122,8 @@ public final class CauldronBedrock {
             removeDisplay(block);
             return;
         }
-        String k = key(block.getLocation());
 
+        String k = key(block.getLocation());
         ItemDisplay existing = cauldronDisplays.get(k);
         if (existing != null && existing.isValid()) {
             existing.remove();
@@ -133,8 +133,8 @@ public final class CauldronBedrock {
         Location loc = block.getLocation().add(0.5, waterY + 0.005, 0.5);
 
         ItemDisplay display = block.getWorld().spawn(loc, ItemDisplay.class, ent -> {
-            ItemStack fluidItem = new ItemStack(Material.LEATHER_HORSE_ARMOR);
-            LeatherArmorMeta meta = (LeatherArmorMeta) fluidItem.getItemMeta();
+            ItemStack fluidItem = new ItemStack(Material.POTION);
+            PotionMeta meta = (PotionMeta) fluidItem.getItemMeta();
             meta.setColor(color);
             meta.setItemModel(ITEM_MODEL_KEY);
             fluidItem.setItemMeta(meta);
@@ -145,7 +145,6 @@ public final class CauldronBedrock {
             ent.setViewRange(1.0f);
             ent.setShadowRadius(0f);
             ent.setShadowStrength(0f);
-            ent.setBrightness(new Display.Brightness(15, 15));
 
             Matrix4f transform = new Matrix4f();
             transform.scale(0.75f, 1.0f, 0.75f);
