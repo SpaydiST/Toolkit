@@ -32,6 +32,7 @@ public final class Config {
     public static String MSG_DEATH_OFF = "Уведомления о координатах смерти выключены";
     public static String MSG_DEATH_USAGE = "Использование: /deathcoords <on|off|show>";
 
+    public static String MSG_COMPASS = "Компас";
     public static String MSG_COORDS = "Координаты:";
     public static String MSG_TRACKING = "Цель: %s";
     public static String MSG_TRACKING_OFFLINE = "Цель оффлайн";
@@ -39,6 +40,7 @@ public final class Config {
     public static String MSG_DISTANCE = " · %s м";
     public static String MSG_COOLDOWN = " · %s с";
     public static String MSG_TARGET_INVISIBLE = "Нельзя отслеживать невидимого игрока";
+    public static String MSG_TIME_LABEL = "Время";
     public static String MSG_TIME = "Время: %s";
     public static String MSG_TO_NIGHT = "До ночи: %s";
     public static String MSG_TO_MORNING = "До утра: %s";
@@ -129,6 +131,7 @@ public final class Config {
         MSG_DEATH_OFF = c.getString("death-coords.off", MSG_DEATH_OFF);
         MSG_DEATH_USAGE = c.getString("death-coords.usage", MSG_DEATH_USAGE);
 
+        MSG_COMPASS = c.getString("messages.compass", MSG_COMPASS);
         MSG_COORDS = c.getString("messages.coords", MSG_COORDS);
         MSG_TRACKING = c.getString("messages.tracking", MSG_TRACKING);
         MSG_TRACKING_OFFLINE = c.getString("messages.tracking-offline", MSG_TRACKING_OFFLINE);
@@ -136,6 +139,7 @@ public final class Config {
         MSG_DISTANCE = c.getString("messages.distance", MSG_DISTANCE);
         MSG_COOLDOWN = c.getString("messages.cooldown", MSG_COOLDOWN);
         MSG_TARGET_INVISIBLE = c.getString("messages.target-invisible", MSG_TARGET_INVISIBLE);
+        MSG_TIME_LABEL = c.getString("messages.time-label", MSG_TIME_LABEL);
         MSG_TIME = c.getString("messages.time", MSG_TIME);
         MSG_TO_NIGHT = c.getString("messages.to-night", MSG_TO_NIGHT);
         MSG_TO_MORNING = c.getString("messages.to-morning", MSG_TO_MORNING);

@@ -141,6 +141,8 @@ death-coords:
 # Сообщения (%s = подстановка). Также можно перевести на другие языки
 # файлами в lang/ — они берутся из локали игрока.
 messages:
+  # Компас
+  compass: "Компас"
   coords: "Координаты:"
   tracking: "Цель: %s"
   tracking-offline: "Цель оффлайн"
@@ -148,6 +150,7 @@ messages:
   distance: " · %s м"
   cooldown: " · %s с"
   target-invisible: "Нельзя отслеживать невидимого игрока"
+  time-label: "Время"
   time: "Время: %s"
   to-night: "До ночи: %s"
   to-morning: "До утра: %s"

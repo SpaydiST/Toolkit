@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +21,6 @@ public final class CompassHud {
 
     private CompassHud() {}
 
-    /** Показать временное сообщение вместо обычного HUD (ошибки взаимодействия). */
     public static void hint(Player p, String text) {
         HINTS.put(p.getUniqueId(), new Hint(text, System.currentTimeMillis() + 2500));
     }
@@ -29,7 +29,9 @@ public final class CompassHud {
         Hint hint = HINTS.get(p.getUniqueId());
         if (hint != null) {
             if (hint.until() > System.currentTimeMillis()) {
-                p.sendActionBar(Component.text(hint.text, NamedTextColor.RED));
+                p.sendActionBar(Msg.prefix(Lang.get(p, "compass"), NamedTextColor.RED)
+                        .append(Msg.sep())
+                        .append(Msg.action(hint.text)));
                 return;
             }
             HINTS.remove(p.getUniqueId());
@@ -39,19 +41,23 @@ public final class CompassHud {
             UUID id = CompassTracker.trackedPlayer(compass);
             Player target = id == null ? null : Bukkit.getPlayer(id);
             if (target == null || !target.isOnline()) {
-                p.sendActionBar(Component.text(Lang.get(p, "tracking-offline"), NamedTextColor.GRAY));
+                p.sendActionBar(Msg.prefix(Lang.get(p, "compass"), NamedTextColor.GRAY)
+                        .append(Msg.sep())
+                        .append(Msg.action(Lang.get(p, "tracking-offline"))));
                 return;
             }
             if (CompassTracker.isLost(compass)) {
-                p.sendActionBar(Component.text(Lang.get(p, "tracking-lost"), NamedTextColor.GRAY));
+                p.sendActionBar(Msg.prefix(Lang.get(p, "compass"), NamedTextColor.GRAY)
+                        .append(Msg.sep())
+                        .append(Msg.action(Lang.get(p, "tracking-lost"))));
                 return;
             }
-            Component msg = Component.text(
-                    Lang.get(p, "tracking").formatted(target.getName()), NamedTextColor.AQUA);
+            Component msg = Msg.prefix(Lang.get(p, "compass"), NamedTextColor.AQUA)
+                    .append(Msg.sep())
+                    .append(Msg.action(target.getName()));
             if (CompassTracker.isOnCooldown(compass)) {
-                msg = msg.append(Component.text(
-                        Lang.get(p, "cooldown").formatted(CompassTracker.cooldownSeconds(compass)),
-                        NamedTextColor.GRAY));
+                msg = msg.append(Msg.sep())
+                        .append(Msg.dim(Lang.get(p, "cooldown").formatted(CompassTracker.cooldownSeconds(compass))));
             }
             p.sendActionBar(msg);
             return;
@@ -62,13 +68,14 @@ public final class CompassHud {
 
     private static void renderCoords(Player p) {
         Location l = p.getLocation();
-        Component msg = Component.text(Lang.get(p, "coords") + " ", NamedTextColor.AQUA)
-                .append(Component.text("X: ", NamedTextColor.RED))
-                .append(Component.text(String.valueOf(l.getBlockX()), NamedTextColor.WHITE))
-                .append(Component.text(" Y: ", NamedTextColor.GREEN))
-                .append(Component.text(String.valueOf(l.getBlockY()), NamedTextColor.WHITE))
-                .append(Component.text(" Z: ", NamedTextColor.BLUE))
-                .append(Component.text(String.valueOf(l.getBlockZ()), NamedTextColor.WHITE));
+        Component msg = Msg.prefix(Lang.get(p, "compass"), NamedTextColor.AQUA)
+                .append(Msg.sep())
+                .append(Msg.accent("X: ", NamedTextColor.RED))
+                .append(Msg.action(String.valueOf(l.getBlockX())))
+                .append(Msg.accent(" Y: ", NamedTextColor.GREEN))
+                .append(Msg.action(String.valueOf(l.getBlockY())))
+                .append(Msg.accent(" Z: ", NamedTextColor.BLUE))
+                .append(Msg.action(String.valueOf(l.getBlockZ())));
         p.sendActionBar(msg);
     }
 }

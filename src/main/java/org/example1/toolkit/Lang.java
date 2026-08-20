@@ -58,6 +58,7 @@ public final class Lang {
 
     public static void bindFallbacks() {
         FALLBACKS.clear();
+        fallback("compass", () -> Config.MSG_COMPASS);
         fallback("coords", () -> Config.MSG_COORDS);
         fallback("tracking", () -> Config.MSG_TRACKING);
         fallback("tracking-offline", () -> Config.MSG_TRACKING_OFFLINE);
@@ -68,6 +69,7 @@ public final class Lang {
         fallback("need-magnet", () -> Config.MSG_NEED_MAGNET);
         fallback("magnet-broken", () -> Config.MSG_MAGNET_BROKEN);
         fallback("unbound", () -> Config.MSG_UNBOUND);
+        fallback("time-label", () -> Config.MSG_TIME_LABEL);
         fallback("time", () -> Config.MSG_TIME);
         fallback("to-night", () -> Config.MSG_TO_NIGHT);
         fallback("to-morning", () -> Config.MSG_TO_MORNING);

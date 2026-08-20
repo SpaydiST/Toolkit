@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 public final class ClockHud {
 
@@ -16,11 +17,13 @@ public final class ClockHud {
         World w = p.getWorld();
         long tick = w.getTime() % 24000;
         String time = formatTime(tick);
-        Component msg = Component.text(Lang.get(p, "time").formatted(time), NamedTextColor.YELLOW);
+        Component msg = Msg.prefix(Lang.get(p, "time-label"), NamedTextColor.YELLOW)
+                .append(Msg.sep())
+                .append(Msg.action(time));
         String skip = skipInfo(p, w, tick, hook);
         if (skip != null && !skip.isEmpty()) {
-            msg = msg.append(Component.text("  ", NamedTextColor.DARK_GRAY))
-                    .append(Component.text(skip, NamedTextColor.GRAY));
+            msg = msg.append(Msg.sep())
+                    .append(Msg.dim(skip));
         }
         p.sendActionBar(msg);
     }
