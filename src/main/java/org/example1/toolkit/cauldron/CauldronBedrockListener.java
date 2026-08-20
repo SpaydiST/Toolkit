@@ -150,14 +150,14 @@ public final class CauldronBedrockListener implements Listener {
 
         event.setCancelled(true);
 
-        int arrowsToTip = Math.min(item.getAmount(), level);
+        int arrowsToTip = item.getAmount();
 
         if (player.getGameMode() != GameMode.CREATIVE) {
             ItemStack tipped = new ItemStack(Material.TIPPED_ARROW, arrowsToTip);
             PotionMeta arrowMeta = (PotionMeta) tipped.getItemMeta();
             arrowMeta.setBasePotionType(data.type());
             tipped.setItemMeta(arrowMeta);
-            item.setAmount(item.getAmount() - arrowsToTip);
+            item.setAmount(0);
             if (player.getInventory().firstEmpty() == -1) {
                 player.getWorld().dropItemNaturally(player.getLocation(), tipped);
             } else {
@@ -165,13 +165,8 @@ public final class CauldronBedrockListener implements Listener {
             }
         }
 
-        int newLevel = level - arrowsToTip;
-        CauldronBedrock.setWaterLevel(block, newLevel);
-        if (newLevel <= 0) {
-            CauldronBedrock.removeAll(block);
-        } else {
-            CauldronBedrock.updateDisplayLevel(block, newLevel);
-        }
+        CauldronBedrock.setWaterLevel(block, 0);
+        CauldronBedrock.removeAll(block);
         player.sendActionBar(Component.text("Стрелы пропитаны зельем! (" + arrowsToTip + ")", NamedTextColor.LIGHT_PURPLE));
     }
 
