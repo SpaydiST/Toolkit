@@ -291,9 +291,11 @@ public final class CauldronBedrock {
     }
 
     private static void spawnColoredParticles(Block block, Color c) {
-        Location loc = block.getLocation().add(0.5, 0.75, 0.5);
-        block.getWorld().spawnParticle(Particle.DUST, loc, 15, 0.3, 0.1, 0.3, 0,
-                new Particle.DustOptions(c, 1.5f));
+        int level = getWaterLevel(block);
+        double y = 0.45 + level * 0.25;
+        Location loc = block.getLocation().add(0.5, y, 0.5);
+        block.getWorld().spawnParticle(Particle.DUST, loc, 8, 0.2, 0.02, 0.2, 0,
+                new Particle.DustOptions(c, 1.2f));
     }
 
     public static Color potionColor(PotionType type) {
@@ -348,7 +350,8 @@ public final class CauldronBedrock {
     }
 
     public static boolean isPotion(ItemStack item) {
-        return item.getType() == Material.POTION || item.getType() == Material.SPLASH_POTION;
+        Material m = item.getType();
+        return m == Material.POTION || m == Material.SPLASH_POTION || m == Material.LINGERING_POTION;
     }
 
     public static boolean isWaterPotion(ItemStack item) {

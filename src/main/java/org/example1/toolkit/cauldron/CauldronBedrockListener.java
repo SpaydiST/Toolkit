@@ -28,25 +28,27 @@ public final class CauldronBedrockListener implements Listener {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
         Block block = event.getClickedBlock();
-        if (block == null || block.getType() != Material.WATER_CAULDRON) return;
+        if (block == null) return;
+        Material type = block.getType();
+        if (type != Material.WATER_CAULDRON && type != Material.CAULDRON) return;
 
         Player player = event.getPlayer();
         ItemStack item = event.getItem();
         if (item == null) return;
         if (event.getHand() == EquipmentSlot.OFF_HAND) return;
 
-        int level = CauldronBedrock.getWaterLevel(block);
-        if (level <= 0) return;
+        boolean isWaterCauldron = type == Material.WATER_CAULDRON;
+        int level = isWaterCauldron ? CauldronBedrock.getWaterLevel(block) : 0;
 
         if (CauldronBedrock.isPotion(item)) {
             handlePotion(event, player, block, item, level);
-        } else if (CauldronBedrock.isDye(item)) {
+        } else if (CauldronBedrock.isDye(item) && isWaterCauldron) {
             handleDye(event, player, block, item, level);
-        } else if (CauldronBedrock.isLeatherArmor(item)) {
+        } else if (CauldronBedrock.isLeatherArmor(item) && isWaterCauldron) {
             handleLeatherArmor(event, player, block, item, level);
-        } else if (CauldronBedrock.isDyedBanner(item)) {
+        } else if (CauldronBedrock.isDyedBanner(item) && isWaterCauldron) {
             handleCleanBanner(event, player, block, item, level);
-        } else if (CauldronBedrock.isDyedShulker(item)) {
+        } else if (CauldronBedrock.isDyedShulker(item) && isWaterCauldron) {
             handleCleanShulker(event, player, block, item, level);
         }
     }
@@ -55,10 +57,9 @@ public final class CauldronBedrockListener implements Listener {
         event.setCancelled(true);
 
         if (CauldronBedrock.isWaterPotion(item)) {
-            if (level < 3) {
-                CauldronBedrock.setWaterLevel(block, level + 1);
-                CauldronBedrock.removeAll(block);
-            }
+            int newLevel = Math.min(level + 1, 3);
+            CauldronBedrock.setWaterLevel(block, newLevel);
+            CauldronBedrock.removeAll(block);
             if (player.getGameMode() != GameMode.CREATIVE) {
                 item.setType(Material.GLASS_BOTTLE);
                 item.editMeta(m -> {});
@@ -181,16 +182,19 @@ public final class CauldronBedrockListener implements Listener {
 
     @EventHandler
     public void onBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() == Material.WATER_CAULDRON) {
+        Material m = event.getBlock().getType();
+        if (m == Material.WATER_CAULDRON || m == Material.CAULDRON) {
             CauldronBedrock.removeAll(event.getBlock());
         }
     }
 
     private void spawnDust(Block block, Color color) {
+        int level = CauldronBedrock.getWaterLevel(block);
+        double y = 0.45 + level * 0.25;
         block.getWorld().spawnParticle(
                 Particle.DUST,
-                block.getLocation().add(0.5, 0.8, 0.5),
-                10, 0.25, 0.1, 0.25, 0,
+                block.getLocation().add(0.5, y, 0.5),
+                8, 0.2, 0.02, 0.2, 0,
                 new Particle.DustOptions(color, 1.2f));
     }
 }
