@@ -95,6 +95,7 @@ public final class Config {
     public static boolean SNOW_GOLEM_FREEZE_ENABLED = true;
     public static boolean BUNDLE_VANISHING_ENABLED = true;
     public static boolean TURTLE_HELM_TRIDENT_ENABLED = true;
+    public static boolean ANIMAL_SPAWNING_ENABLED = false;
 
     private Config() {}
 
@@ -196,5 +197,6 @@ public final class Config {
         SNOW_GOLEM_FREEZE_ENABLED = c.getBoolean("snow-golem-freeze.enabled", true);
         BUNDLE_VANISHING_ENABLED = c.getBoolean("bundle-vanishing.enabled", true);
         TURTLE_HELM_TRIDENT_ENABLED = c.getBoolean("turtle-helm-trident.enabled", true);
+        ANIMAL_SPAWNING_ENABLED = c.getBoolean("animal-spawning.enabled", false);
     }
 }

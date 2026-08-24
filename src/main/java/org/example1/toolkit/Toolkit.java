@@ -37,6 +37,8 @@ import org.example1.toolkit.temple.JungleTempleListener;
 import org.example1.toolkit.snowgolem.SnowGolemFreezeListener;
 import org.example1.toolkit.bundlevanish.BundleVanishingListener;
 import org.example1.toolkit.turtle.TurtleHelmListener;
+import org.example1.toolkit.animal.AnimalSpawner;
+import org.example1.toolkit.animal.AnimalSpawnerListener;
 import org.example1.toolkit.nms.Nms;
 import org.jetbrains.annotations.NotNull;
 
@@ -105,6 +107,8 @@ public final class Toolkit extends JavaPlugin {
         CauldronBedrock.startColorTask(this);
         CauldronBedrock.restoreAllDisplays();
 
+        AnimalSpawner.reload(this);
+
         registerToolkitCommand();
         registerDeathCoordsCommand();
         registerCauldronTestCommand();
@@ -172,6 +176,7 @@ public final class Toolkit extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SnowGolemFreezeListener(), this);
         getServer().getPluginManager().registerEvents(new BundleVanishingListener(), this);
         getServer().getPluginManager().registerEvents(new TurtleHelmListener(), this);
+        getServer().getPluginManager().registerEvents(new AnimalSpawnerListener(), this);
         getServer().getPluginManager().registerEvents(new F3Hider(), this);
         getServer().getPluginManager().registerEvents(new DeathCoordsListener(), this);
         if (CoordObfuscator.isAvailable()) {
@@ -206,6 +211,7 @@ public final class Toolkit extends JavaPlugin {
                 Lang.bindFallbacks();
                 DeathCoords.reload();
                 policy = EditPolicy.load(this);
+                AnimalSpawner.reload(this);
                 InvisibleFrameRecipe.unregister();
                 DebugStickRecipe.unregister();
                 InvisibleLightRecipe.unregister();
