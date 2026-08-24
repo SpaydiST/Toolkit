@@ -4,64 +4,52 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Dispenser;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockDispenseEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.BlockProjectileSource;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionType;
 import org.example1.toolkit.Config;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 public final class JungleTempleListener implements Listener {
-
-    private static final int TRAP_RANGE = 16;
-    private final ConcurrentHashMap<Location, Long> recentDispenserFires = new ConcurrentHashMap<>();
 
     @EventHandler
     public void onDispense(BlockDispenseEvent event) {
         if (!Config.JUNGLE_TEMPLE_ARROWS_ENABLED) return;
-        if (!isArrow(event.getItem())) return;
-        if (!(event.getBlock().getState() instanceof Dispenser dispenser)) return;
-        if (!(dispenser.getBlock().getBlockData().getAsString().contains("dispenser"))) return;
-
+        if (event.getItem().getType() != Material.ARROW) return;
         if (!isInJungleTemple(event.getBlock())) return;
 
-        recentDispenserFires.put(event.getBlock().getLocation(), System.currentTimeMillis());
-        long now = System.currentTimeMillis();
-        recentDispenserFires.entrySet().removeIf(e -> now - e.getValue() > 1000);
+        convertDispenser(event.getBlock());
     }
 
     @EventHandler
-    public void onArrowSpawn(EntitySpawnEvent event) {
+    public void onChunkLoad(ChunkLoadEvent event) {
         if (!Config.JUNGLE_TEMPLE_ARROWS_ENABLED) return;
-        if (!(event.getEntity() instanceof Arrow)) return;
-
-        Arrow arrow = (Arrow) event.getEntity();
-        Location arrowLoc = arrow.getLocation();
-
-        long now = System.currentTimeMillis();
-        recentDispenserFires.entrySet().removeIf(e -> now - e.getValue() > 1000);
-
-        for (Map.Entry<Location, Long> entry : recentDispenserFires.entrySet()) {
-            if (entry.getKey().getWorld() != arrowLoc.getWorld()) continue;
-            if (entry.getKey().distance(arrowLoc) < TRAP_RANGE) {
-                arrow.addCustomEffect(new PotionEffect(PotionEffectType.POISON, 100, 0), true);
-                return;
+        for (var state : event.getChunk().getTileEntities()) {
+            if (state instanceof Dispenser && state instanceof Block block) {
+                if (isInJungleTemple(block)) {
+                    convertDispenser(block);
+                }
             }
         }
     }
 
-    private boolean isArrow(ItemStack item) {
-        Material m = item.getType();
-        return m == Material.ARROW || m == Material.TIPPED_ARROW || m == Material.SPECTRAL_ARROW;
+    private void convertDispenser(Block block) {
+        if (!(block.getState() instanceof Dispenser dispenser)) return;
+        Inventory inv = dispenser.getInventory();
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack item = inv.getItem(i);
+            if (item != null && item.getType() == Material.ARROW) {
+                ItemStack tipped = new ItemStack(Material.TIPPED_ARROW, item.getAmount());
+                PotionMeta meta = (PotionMeta) tipped.getItemMeta();
+                meta.setBasePotionType(PotionType.POISON);
+                tipped.setItemMeta(meta);
+                inv.setItem(i, tipped);
+            }
+        }
     }
 
     private boolean isInJungleTemple(Block block) {
@@ -69,7 +57,8 @@ public final class JungleTempleListener implements Listener {
         var world = loc.getWorld();
         if (world == null) return false;
 
-        var result = world.locateNearestStructure(loc, org.bukkit.generator.structure.StructureType.JUNGLE_TEMPLE, 100, false);
+        var result = world.locateNearestStructure(loc,
+                org.bukkit.generator.structure.StructureType.JUNGLE_TEMPLE, 100, false);
         if (result != null) {
             Location center = result.getLocation();
             if (center.getWorld() == loc.getWorld() &&
