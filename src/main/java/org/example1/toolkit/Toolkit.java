@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.NamespacedKey;
@@ -120,6 +121,12 @@ public final class Toolkit extends JavaPlugin {
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 return new DeathCoordsCommand().onCommand(sender, this, commandLabel, args);
             }
+
+            @Override
+            public @NotNull java.util.List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+                if (args.length == 1) return java.util.List.of("on", "off", "show");
+                return java.util.List.of();
+            }
         };
         deathCoords.setDescription("Координаты смерти: on/off — уведомления, без аргументов — показать последнюю смерть");
         deathCoords.setUsage("/deathcoords <on|off|show>");
@@ -127,7 +134,7 @@ public final class Toolkit extends JavaPlugin {
     }
 
     private void registerCauldronTestCommand() {
-        Command cmd = new Command("cauldrontest") {
+        Command cmd = new Command("cauldron") {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 if (!(sender instanceof Player player)) {
@@ -154,6 +161,12 @@ public final class Toolkit extends JavaPlugin {
             @Override
             public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
                 return Toolkit.this.onCommand(sender, this, commandLabel, args);
+            }
+
+            @Override
+            public @NotNull java.util.List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+                if (args.length == 1) return java.util.List.of("reload");
+                return java.util.List.of();
             }
         };
         toolkit.setDescription("Управление плагином Toolkit");
