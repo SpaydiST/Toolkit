@@ -40,6 +40,8 @@ import org.example1.toolkit.bundlevanish.BundleVanishingListener;
 import org.example1.toolkit.turtle.TurtleHelmListener;
 import org.example1.toolkit.animal.AnimalSpawner;
 import org.example1.toolkit.animal.AnimalSpawnerListener;
+import org.example1.toolkit.status.StatusCommand;
+import org.example1.toolkit.status.StatusListener;
 import org.example1.toolkit.nms.Nms;
 import org.jetbrains.annotations.NotNull;
 
@@ -113,6 +115,7 @@ public final class Toolkit extends JavaPlugin {
         registerToolkitCommand();
         registerDeathCoordsCommand();
         registerCauldronTestCommand();
+        registerStatusCommand();
     }
 
     private void registerDeathCoordsCommand() {
@@ -175,6 +178,23 @@ public final class Toolkit extends JavaPlugin {
         getServer().getCommandMap().register("toolkit", toolkit);
     }
 
+    private void registerStatusCommand() {
+        Command status = new Command("status") {
+            @Override
+            public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
+                return new StatusCommand().onCommand(sender, this, commandLabel, args);
+            }
+
+            @Override
+            public @NotNull java.util.List<String> tabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull String[] args) {
+                return new StatusCommand().onTabComplete(sender, this, alias, args);
+            }
+        };
+        status.setDescription("Статус игрока: streaming, recording, dnd");
+        status.setUsage("/status <none|streaming|recording|dnd|info>");
+        getServer().getCommandMap().register("status", status);
+    }
+
     private void registerListeners() {
         HandlerList.unregisterAll(this);
         getServer().getPluginManager().registerEvents(new CompassBindListener(), this);
@@ -192,6 +212,7 @@ public final class Toolkit extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AnimalSpawnerListener(), this);
         getServer().getPluginManager().registerEvents(new F3Hider(), this);
         getServer().getPluginManager().registerEvents(new DeathCoordsListener(), this);
+        getServer().getPluginManager().registerEvents(new StatusListener(), this);
         if (CoordObfuscator.isAvailable()) {
             getServer().getPluginManager().registerEvents(new CoordOffsetListener(), this);
         }

@@ -23,6 +23,7 @@ public final class Config {
     public static int COORD_OFFSET_RANGE_CHUNKS = 128;
     public static boolean COORD_OFFSET_PERSISTENT = true;
     public static String COORD_OFFSET_BYPASS_PERMISSION = "toolkit.coordoffset.bypass";
+    public static boolean COORD_OFFSET_AXIOM_FIX = true;
 
     public static boolean DEATH_COORDS_ENABLED = true;
     public static boolean DEATH_COORDS_DEFAULT_ENABLED = true;
@@ -124,6 +125,7 @@ public final class Config {
         COORD_OFFSET_RANGE_CHUNKS = Math.max(0, c.getInt("coord-offset.range-chunks", 128));
         COORD_OFFSET_PERSISTENT = c.getBoolean("coord-offset.persistent", true);
         COORD_OFFSET_BYPASS_PERMISSION = c.getString("coord-offset.bypass-permission", COORD_OFFSET_BYPASS_PERMISSION);
+        COORD_OFFSET_AXIOM_FIX = c.getBoolean("coord-offset.axiom-fix", true);
 
         DEATH_COORDS_ENABLED = c.getBoolean("death-coords.enabled", true);
         DEATH_COORDS_DEFAULT_ENABLED = c.getBoolean("death-coords.default-enabled", true);

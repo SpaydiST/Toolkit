@@ -90,6 +90,9 @@ public final class CoordPacketListener implements PacketListener {
 
     @Override
     public void onPacketSend(PacketSendEvent event) {
+        if (translateAxiomResponse(event)) {
+            return;
+        }
         if (markVoxySend(event)) {
             return;
         }
@@ -127,6 +130,12 @@ public final class CoordPacketListener implements PacketListener {
         if (loggedErrors.add(packetName)) {
             Bukkit.getLogger().warning("[Toolkit] Ошибка обфускации координат в пакете " + packetName + ": " + t);
         }
+    }
+
+    private static final java.util.concurrent.atomic.AtomicInteger AXIOM_S2C_DIAG = new java.util.concurrent.atomic.AtomicInteger();
+
+    private static int axiomDiag() {
+        return AXIOM_S2C_DIAG.incrementAndGet();
     }
 
     private void handleSend(PacketSendEvent event, FixedOffset offset) {
@@ -242,12 +251,13 @@ public final class CoordPacketListener implements PacketListener {
                     wrapper.setPosition(CoordObfuscator.apply(wrapper.getPosition(), offset));
                 }
                 case SOUND_EFFECT -> {
+                    // ВАЖНО: getEffectPosition()/setEffectPosition() в packetevents - это
+                    // производное представление того же поля position (координаты * 8).
+                    // Сдвигать можно только один раз, иначе звук улетает на двойной
+                    // оффсет и перестаёт быть слышен (удары, взрывы, /playsound и т.д.).
                     WrapperPlayServerSoundEffect wrapper = new WrapperPlayServerSoundEffect(event);
                     if (wrapper.getPosition() != null) {
                         wrapper.setPosition(CoordObfuscator.apply(wrapper.getPosition(), offset));
-                    }
-                    if (wrapper.getEffectPosition() != null) {
-                        wrapper.setEffectPosition(CoordObfuscator.applyTimes8(wrapper.getEffectPosition(), offset));
                     }
                 }
                 case PARTICLE -> {
@@ -420,6 +430,23 @@ public final class CoordPacketListener implements PacketListener {
                     WrapperPlayClientUpdateJigsawBlock wrapper = new WrapperPlayClientUpdateJigsawBlock(event);
                     wrapper.setPosition(CoordObfuscator.unapply(wrapper.getPosition(), offset));
                 }
+                // Ctrl+средний клик по блоку с NBT: без разворота сервер ответит
+                // по реальным координатам - "блок не найден" или не тот блок.
+                case QUERY_BLOCK_NBT -> {
+                    com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientQueryBlockNBT wrapper =
+                            new com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientQueryBlockNBT(event);
+                    wrapper.setBlockPosition(CoordObfuscator.unapply(wrapper.getBlockPosition(), offset));
+                }
+                case SET_TEST_BLOCK -> {
+                    com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetTestBlock wrapper =
+                            new com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientSetTestBlock(event);
+                    wrapper.setPosition(CoordObfuscator.unapply(wrapper.getPosition(), offset));
+                }
+                case TEST_INSTANCE_BLOCK_ACTION -> {
+                    com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTestInstanceBlockAction wrapper =
+                            new com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientTestInstanceBlockAction(event);
+                    wrapper.setPosition(CoordObfuscator.unapply(wrapper.getPosition(), offset));
+                }
                 default -> handled = false;
             }
         } else {
@@ -428,6 +455,43 @@ public final class CoordPacketListener implements PacketListener {
         if (handled) {
             event.markForReEncode(true);
         }
+    }
+
+    /**
+     * Ответ axiom:response_chunk_data: сервер эхом возвращает ключи секций и
+     * блочных сущностей из нашего (сдвинутого) запроса — переводим их обратно
+     * в пространство клиента. Контейнеры копируются как есть (оффсаты кратны
+     * секциям, см. AxiomTranslator). Возвращает true, если канал аксиома.
+     */
+    private boolean translateAxiomResponse(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Play.Server.PLUGIN_MESSAGE) {
+            return false;
+        }
+        WrapperPlayServerPluginMessage wrapper = new WrapperPlayServerPluginMessage(event);
+        if (!AxiomTranslator.RESPONSE_CHANNEL.equals(wrapper.getChannelName())) {
+            return false;
+        }
+        PlayerOffsets offsets = CoordObfuscator.offsets(event.getUser());
+        if (offsets == null || offsets.bypass() || offsets.isCurrentZero()) {
+            if (axiomDiag() <= 15) Bukkit.getLogger().info("[Toolkit][axiom-diag] S2C response_chunk_data: оффсета нет — пропущен");
+            return true;
+        }
+        try {
+            FixedOffset off = offsets.current();
+            byte[] data = wrapper.getData();
+            byte[] translated = AxiomTranslator.translateResponseChunkData(
+                    data, off.x(), off.z());
+            if (axiomDiag() <= 15) Bukkit.getLogger().info("[Toolkit][axiom-diag] S2C response_chunk_data: "
+                    + (translated != null ? "переведён " + data.length + "Б -> " + translated.length + "Б"
+                                          : "не распознан"));
+            if (translated != null) {
+                wrapper.setData(translated);
+                event.markForReEncode(true);
+            }
+        } catch (Throwable t) {
+            logError(AxiomTranslator.RESPONSE_CHANNEL, t);
+        }
+        return true;
     }
 
     private boolean markVoxySend(PacketSendEvent event) {

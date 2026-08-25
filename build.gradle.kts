@@ -13,6 +13,8 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     compileOnly("com.github.retrooper:packetevents-api:2.13.0")
     compileOnly(files("libs/LibsDisguises.jar"))
+    // Для AxiomChannelInjector: нетти есть в рантайме сервера, здесь только API.
+    compileOnly("io.netty:netty-handler:4.2.7.Final")
 }
 
 java {
