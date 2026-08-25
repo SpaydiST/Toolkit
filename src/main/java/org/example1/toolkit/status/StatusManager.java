@@ -2,11 +2,13 @@ package org.example1.toolkit.status;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.example1.toolkit.FlectonePulseCompat;
 
 public final class StatusManager {
     public enum PlayerStatus {
@@ -36,6 +38,8 @@ public final class StatusManager {
     }
 
     private static void updateListName(Player player) {
+        if (FlectonePulseCompat.isAvailable()) return;
+
         String prefix = switch (get(player.getUniqueId())) {
             case STREAMING, RECORDING -> "● ";
             case DND -> "■ ";

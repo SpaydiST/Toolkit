@@ -112,6 +112,8 @@ public final class Toolkit extends JavaPlugin {
 
         AnimalSpawner.reload(this);
 
+        FlectonePulseCompat.init(this);
+
         registerToolkitCommand();
         registerDeathCoordsCommand();
         registerCauldronTestCommand();

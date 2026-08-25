@@ -97,6 +97,7 @@ public final class Config {
     public static boolean BUNDLE_VANISHING_ENABLED = true;
     public static boolean TURTLE_HELM_TRIDENT_ENABLED = true;
     public static boolean ANIMAL_SPAWNING_ENABLED = false;
+    public static boolean FLECTONEPULSE_COMPAT = true;
 
     private Config() {}
 
@@ -200,5 +201,6 @@ public final class Config {
         BUNDLE_VANISHING_ENABLED = c.getBoolean("bundle-vanishing.enabled", true);
         TURTLE_HELM_TRIDENT_ENABLED = c.getBoolean("turtle-helm-trident.enabled", true);
         ANIMAL_SPAWNING_ENABLED = c.getBoolean("animal-spawning.enabled", false);
+        FLECTONEPULSE_COMPAT = c.getBoolean("flectonepulse-compat", true);
     }
 }

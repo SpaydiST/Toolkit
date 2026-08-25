@@ -99,6 +99,11 @@ turtle-helm-trident:
 # - Список spawn-rules: environments (NORMAL/NETHER/THE_END), biomes, on-top-of (материал или #тег), types
 animal-spawning:
   enabled: true
+
+# Совместимость с FlectonePulse
+# - Если FlectonePulse установлен, Toolkit передаёт ему управление TAB и action bar
+# - Отключить: false (Toolkit будет работать параллельно, возможны конфликты)
+flectonepulse-compat: true
   spawning-chunk-chance: 0.65
   spawn-tries:
     min: 1

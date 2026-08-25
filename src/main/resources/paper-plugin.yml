@@ -13,6 +13,9 @@ dependencies:
       required: false
     LibsDisguises:
       required: false
+    FlectonePulse:
+      load: AFTER
+      required: false
 defaultPerm: op
 permissions:
   toolkit.reload:

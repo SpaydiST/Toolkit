@@ -27,6 +27,7 @@ public final class Hud {
 
     private void tick() {
         if (!Config.COMPASS_ENABLED && !Config.CLOCK_ENABLED) return;
+        if (FlectonePulseCompat.isAvailable() && Config.FLECTONEPULSE_COMPAT) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isDead() || !p.isOnline()) continue;
             if (p.isSleeping()) continue;
