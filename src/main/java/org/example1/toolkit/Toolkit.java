@@ -117,7 +117,9 @@ public final class Toolkit extends JavaPlugin {
         registerToolkitCommand();
         registerDeathCoordsCommand();
         registerCauldronTestCommand();
-        registerStatusCommand();
+        if (!FlectonePulseCompat.isAvailable()) {
+            registerStatusCommand();
+        }
     }
 
     private void registerDeathCoordsCommand() {
@@ -214,7 +216,9 @@ public final class Toolkit extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new AnimalSpawnerListener(), this);
         getServer().getPluginManager().registerEvents(new F3Hider(), this);
         getServer().getPluginManager().registerEvents(new DeathCoordsListener(), this);
-        getServer().getPluginManager().registerEvents(new StatusListener(), this);
+        if (!FlectonePulseCompat.isAvailable()) {
+            getServer().getPluginManager().registerEvents(new StatusListener(), this);
+        }
         if (CoordObfuscator.isAvailable()) {
             getServer().getPluginManager().registerEvents(new CoordOffsetListener(), this);
         }
