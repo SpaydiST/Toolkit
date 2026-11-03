@@ -69,6 +69,7 @@ public final class Lang {
         fallback("need-magnet", () -> Config.MSG_NEED_MAGNET);
         fallback("magnet-broken", () -> Config.MSG_MAGNET_BROKEN);
         fallback("unbound", () -> Config.MSG_UNBOUND);
+        fallback("unbound-magnet", () -> Config.MSG_UNBOUND_MAGNET);
         fallback("time-label", () -> Config.MSG_TIME_LABEL);
         fallback("time", () -> Config.MSG_TIME);
         fallback("to-night", () -> Config.MSG_TO_NIGHT);
@@ -80,6 +81,11 @@ public final class Lang {
         fallback("potion-mixed", () -> Config.MSG_POTION_MIXED);
         fallback("potion-full", () -> Config.MSG_POTION_FULL);
         fallback("potion-taken", () -> Config.MSG_POTION_TAKEN);
+        fallback("potion-dissolved", () -> Config.MSG_POTION_DISSOLVED);
+        fallback("murky-water", () -> Config.MSG_MURKY_WATER);
+        fallback("cauldron-exploded", () -> Config.MSG_CAULDRON_EXPLODED);
+        fallback("potion-chaos", () -> Config.MSG_POTION_CHAOS);
+        fallback("potion-synergy", () -> Config.MSG_POTION_SYNERGY);
         fallback("arrows-tipped", () -> Config.MSG_ARROWS_TIPPED);
         fallback("dye-added", () -> Config.MSG_DYE_ADDED);
         fallback("armor-dyed", () -> Config.MSG_ARMOR_DYED);
@@ -91,6 +97,11 @@ public final class Lang {
         fallback("mixed", () -> Config.MSG_MIXED);
         fallback("level", () -> Config.MSG_LEVEL);
         fallback("pcs", () -> Config.MSG_PCS);
+        fallback("block-washed", () -> Config.MSG_BLOCK_WASHED);
+        fallback("honey", () -> Config.MSG_HONEY);
+        fallback("honey-collected", () -> Config.MSG_HONEY_COLLECTED);
+        fallback("honey-poured", () -> Config.MSG_HONEY_POURED);
+        fallback("honey-full", () -> Config.MSG_HONEY_FULL);
         fallback("debugstick", () -> Config.MSG_DEBUGSTICK);
         fallback("no-editable", () -> Config.MSG_NO_EDITABLE);
         fallback("selected", () -> Config.MSG_SELECTED);

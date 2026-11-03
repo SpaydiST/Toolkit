@@ -12,11 +12,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.example1.toolkit.Config;
+import org.example1.toolkit.ActionBarManager;
 import org.example1.toolkit.Lang;
 import org.example1.toolkit.Msg;
 import org.example1.toolkit.nms.Nms;
+import org.example1.toolkit.progression.AchievementProgression;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +36,13 @@ public final class DebugStickListener implements Listener {
         this.policy = policy;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
+    public void onQuit(PlayerQuitEvent event) {
+        String prefix = event.getPlayer().getUniqueId() + ":";
+        selection.keySet().removeIf(k -> k.startsWith(prefix));
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (!Config.DEBUG_STICK_ENABLED) return;
         ItemStack item = event.getItem();
@@ -52,9 +61,16 @@ public final class DebugStickListener implements Listener {
 
         if (action == Action.LEFT_CLICK_BLOCK) {
             if (player.isSneaking()) {
+                if (editable(block).isEmpty()) {
+                    Msg.of(player,
+                            Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
+                            Msg.sep(),
+                            Msg.action(Lang.get(player, "no-editable")));
+                    return;
+                }
                 DebugStick.saveState(item, block);
                 Msg.of(player,
-                        Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GREEN),
+                        Msg.prefix(Lang.get(player, "debugstick"), Msg.EMERALD),
                         Msg.sep(),
                         Msg.action(Lang.get(player, "stick-state-copied")),
                         Msg.sep(),
@@ -72,7 +88,7 @@ public final class DebugStickListener implements Listener {
                     DebugStick.consumeUse(item);
                     if (!DebugStick.isDebugStick(item)) {
                         Msg.of(player,
-                                Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                                Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                                 Msg.sep(),
                                 Msg.action(Lang.get(player, "stick-broken")));
                     }
@@ -82,24 +98,47 @@ public final class DebugStickListener implements Listener {
     }
 
     private void applyState(Player player, Block block, ItemStack item) {
-        BlockData newData = DebugStick.getCopiedState(item);
-        if (newData == null) {
+        BlockData copiedData = DebugStick.getCopiedState(item);
+        Map<String, List<String>> editable = editable(block);
+        if (copiedData == null || editable.isEmpty()) {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "stick-state-fail")));
             return;
         }
-        block.setBlockData(newData);
+        BlockData targetData = block.getBlockData();
+        boolean anyChanged = false;
+        for (Map.Entry<String, List<String>> entry : editable.entrySet()) {
+            String propName = entry.getKey();
+            Object copiedVal = Nms.currentValue(copiedData, propName);
+            if (copiedVal == null) continue;
+            List<Object> allowedVals = resolveValues(targetData, propName, entry.getValue());
+            if (!allowedVals.contains(copiedVal)) continue;
+            BlockData updated = Nms.withValue(targetData, propName, copiedVal);
+            if (updated != null && !updated.equals(targetData)) {
+                targetData = updated;
+                anyChanged = true;
+            }
+        }
+        if (!anyChanged) {
+            Msg.of(player,
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
+                    Msg.sep(),
+                    Msg.action(Lang.get(player, "no-editable")));
+            return;
+        }
+        block.setBlockData(targetData);
+        AchievementProgression.award(player, "toolkit_debugstick");
         DebugStick.consumeUse(item);
         if (!DebugStick.isDebugStick(item)) {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "stick-broken")));
         } else {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GREEN),
+                    Msg.prefix(Lang.get(player, "debugstick"), Msg.EMERALD),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "stick-state-applied")),
                     Msg.sep(),
@@ -107,7 +146,7 @@ public final class DebugStickListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockDamage(BlockDamageEvent event) {
         if (!Config.DEBUG_STICK_ENABLED) return;
         ItemStack item = event.getItemInHand();
@@ -116,7 +155,7 @@ public final class DebugStickListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         if (!Config.DEBUG_STICK_ENABLED) return;
         ItemStack item = event.getPlayer().getInventory().getItemInMainHand();
@@ -130,7 +169,7 @@ public final class DebugStickListener implements Listener {
         List<String> names = new ArrayList<>(editable.keySet());
         if (names.isEmpty()) {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "no-editable")));
             return;
@@ -148,7 +187,7 @@ public final class DebugStickListener implements Listener {
         String propName = names.get(index);
         selection.put(key, propName);
         Msg.of(player,
-                Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GRAY),
+                Msg.prefix(Lang.get(player, "debugstick"), Msg.EMERALD),
                 Msg.sep(),
                 Msg.action(Lang.get(player, "selected")),
                 Msg.sep(),
@@ -159,7 +198,7 @@ public final class DebugStickListener implements Listener {
         Map<String, List<String>> editable = editable(block);
         if (editable.isEmpty()) {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "no-editable")));
             return false;
@@ -175,7 +214,7 @@ public final class DebugStickListener implements Listener {
         List<Object> values = resolveValues(block.getBlockData(), propName, editable.get(propName));
         if (values.size() < 2) {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "no-editable")));
             return false;
@@ -185,7 +224,7 @@ public final class DebugStickListener implements Listener {
         int curIdx = values.indexOf(cur);
         if (curIdx < 0) {
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "debugstick"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "no-editable")));
             return false;
@@ -197,14 +236,15 @@ public final class DebugStickListener implements Listener {
             return false;
         }
         block.setBlockData(newData);
+        AchievementProgression.award(player, "toolkit_debugstick");
 
-        Component msg = Msg.prefix(Lang.get(player, "debugstick"), NamedTextColor.GRAY)
+        Component msg = Msg.prefix(Lang.get(player, "debugstick"), Msg.EMERALD)
                 .append(Msg.sep())
                 .append(Msg.dim(block.getType().name().toLowerCase()))
                 .append(Msg.eq())
                 .append(Msg.val(propName + " = "))
                 .append(Msg.accent(String.valueOf(values.get(newIdx)), NamedTextColor.WHITE));
-        player.sendActionBar(msg);
+        ActionBarManager.show(player, "toolkit:debugstick", msg, 40, 50);
         return true;
     }
 

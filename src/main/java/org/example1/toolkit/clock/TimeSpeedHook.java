@@ -11,34 +11,58 @@ import java.lang.reflect.Method;
  */
 public final class TimeSpeedHook {
 
+    private Plugin timeSpeedPlugin;
     private Object sleepHandler;
-    private Method getWorldSpeed;
+    private Method getPluginWorldSpeed;
+    private Method getSleepHandlerWorldSpeed;
 
     public void init() {
+        clear();
         Plugin plugin = Bukkit.getPluginManager().getPlugin("TimeSpeed-plugin");
-        if (plugin == null) return;
+        if (plugin == null || !plugin.isEnabled()) return;
+        timeSpeedPlugin = plugin;
         try {
-            Method getHandler = plugin.getClass().getMethod("getSleepHandler");
-            sleepHandler = getHandler.invoke(plugin);
-            if (sleepHandler == null) return;
-            getWorldSpeed = sleepHandler.getClass().getMethod("getWorldSpeed", World.class);
+            getPluginWorldSpeed = plugin.getClass().getMethod("getWorldTimeSpeed", World.class);
         } catch (Throwable t) {
-            sleepHandler = null;
-            getWorldSpeed = null;
+            try {
+                Method getHandler = plugin.getClass().getMethod("getSleepHandler");
+                sleepHandler = getHandler.invoke(plugin);
+                if (sleepHandler != null) {
+                    getSleepHandlerWorldSpeed = sleepHandler.getClass().getMethod("getWorldSpeed", World.class);
+                }
+            } catch (Throwable ignored) {
+                clear();
+            }
         }
     }
 
     public boolean available() {
-        return getWorldSpeed != null;
+        Plugin current = Bukkit.getPluginManager().getPlugin("TimeSpeed-plugin");
+        if (current == null || !current.isEnabled()) {
+            clear();
+            return false;
+        }
+        if (current != timeSpeedPlugin) init();
+        return timeSpeedPlugin == current && (getPluginWorldSpeed != null || getSleepHandlerWorldSpeed != null);
     }
 
     public double currentSpeed(World world) {
-        if (getWorldSpeed == null) return 0.0;
+        if (!available()) return 0.0;
         try {
-            Object value = getWorldSpeed.invoke(sleepHandler, world);
+            Object value = getPluginWorldSpeed != null
+                    ? getPluginWorldSpeed.invoke(timeSpeedPlugin, world)
+                    : getSleepHandlerWorldSpeed.invoke(sleepHandler, world);
             return value instanceof Number number ? number.doubleValue() : 0.0;
         } catch (Throwable t) {
+            clear();
             return 0.0;
         }
+    }
+
+    private void clear() {
+        timeSpeedPlugin = null;
+        sleepHandler = null;
+        getPluginWorldSpeed = null;
+        getSleepHandlerWorldSpeed = null;
     }
 }

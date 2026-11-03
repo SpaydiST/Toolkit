@@ -10,7 +10,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Доступ к состояниям блоков (NMS) через рефлексию для версии 26.2.
@@ -205,19 +204,25 @@ public final class Nms {
     }
 
     private static Class<?> PLAYER_NMS;
+    private static Class<?> COMPOUND_TAG;
     private static Method GET_HANDLE_LEFT;
     private static Method GET_HANDLE_RIGHT;
     private static Method SET_LEFT;
     private static Method SET_RIGHT;
+    private static Method TAG_IS_EMPTY;
+    private static Method TAG_GET_INT;
 
     static {
         try {
             ClassLoader cl = Bukkit.getServer().getClass().getClassLoader();
             PLAYER_NMS = Class.forName("net.minecraft.world.entity.player.Player", false, cl);
-            GET_HANDLE_LEFT = PLAYER_NMS.getMethod("getShoulderParrotLeft");
-            GET_HANDLE_RIGHT = PLAYER_NMS.getMethod("getShoulderParrotRight");
-            SET_LEFT = PLAYER_NMS.getMethod("setShoulderParrotLeft", Optional.class);
-            SET_RIGHT = PLAYER_NMS.getMethod("setShoulderParrotRight", Optional.class);
+            COMPOUND_TAG = Class.forName("net.minecraft.nbt.CompoundTag", false, cl);
+            GET_HANDLE_LEFT = PLAYER_NMS.getMethod("getShoulderEntityLeft");
+            GET_HANDLE_RIGHT = PLAYER_NMS.getMethod("getShoulderEntityRight");
+            SET_LEFT = PLAYER_NMS.getMethod("setShoulderEntityLeft", COMPOUND_TAG);
+            SET_RIGHT = PLAYER_NMS.getMethod("setShoulderEntityRight", COMPOUND_TAG);
+            TAG_IS_EMPTY = COMPOUND_TAG.getMethod("isEmpty");
+            TAG_GET_INT = COMPOUND_TAG.getMethod("getInt", String.class);
         } catch (Throwable ignored) {}
     }
 
@@ -227,9 +232,8 @@ public final class Nms {
             Object nmsPlayer = toNmsPlayer(player);
             Method method = left ? GET_HANDLE_LEFT : GET_HANDLE_RIGHT;
             if (method == null || nmsPlayer == null) return false;
-            Object optional = method.invoke(nmsPlayer);
-            if (optional == null) return false;
-            return ((java.util.Optional<?>) optional).isPresent();
+            Object nbtRaw = method.invoke(nmsPlayer);
+            return nbtRaw != null && !((Boolean) TAG_IS_EMPTY.invoke(nbtRaw));
         } catch (Throwable e) {
             return false;
         }
@@ -241,13 +245,17 @@ public final class Nms {
             Object nmsPlayer = toNmsPlayer(player);
             Method method = left ? GET_HANDLE_LEFT : GET_HANDLE_RIGHT;
             if (method == null || nmsPlayer == null) return 0;
-            Object optional = method.invoke(nmsPlayer);
-            if (optional == null) return 0;
-            java.util.Optional<?> opt = (java.util.Optional<?>) optional;
-            if (opt.isEmpty()) return 0;
-            Object variant = opt.get();
-            Method ordinal = variant.getClass().getMethod("ordinal");
-            return (int) ordinal.invoke(variant);
+            Object nbtRaw = method.invoke(nmsPlayer);
+            if (nbtRaw == null || TAG_GET_INT == null) return 0;
+            Object res = TAG_GET_INT.invoke(nbtRaw, "Variant");
+            if (res instanceof java.util.Optional<?> opt) {
+                Object val = opt.orElse(null);
+                return val instanceof Number num ? num.intValue() : 0;
+            }
+            if (res instanceof Number num) {
+                return num.intValue();
+            }
+            return 0;
         } catch (Throwable e) {
             return 0;
         }
@@ -257,8 +265,9 @@ public final class Nms {
         try {
             Object nmsPlayer = toNmsPlayer(player);
             Method method = left ? SET_LEFT : SET_RIGHT;
-            if (method == null || nmsPlayer == null) return;
-            method.invoke(nmsPlayer, java.util.Optional.empty());
+            if (method == null || nmsPlayer == null || COMPOUND_TAG == null) return;
+            Object empty = COMPOUND_TAG.getDeclaredConstructor().newInstance();
+            method.invoke(nmsPlayer, empty);
         } catch (Throwable ignored) {}
     }
 

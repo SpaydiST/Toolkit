@@ -10,8 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
 
 /**
- * Рецепт стола кузнеца: палка + звезда Незера = дебагстик (1000 использований).
- * Шаблон не требуется (RecipeChoice.empty()).
+ * Рецепт стола кузнеца: палка + звезда Незера + шаблон улучшения незерита = дебагстик.
  */
 public final class DebugStickRecipe {
 
@@ -26,7 +25,7 @@ public final class DebugStickRecipe {
         SmithingTransformRecipe recipe = new SmithingTransformRecipe(
                 recipeKey,
                 result,
-                RecipeChoice.empty(),
+                new RecipeChoice.MaterialChoice(Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
                 new RecipeChoice.MaterialChoice(Material.STICK),
                 new RecipeChoice.MaterialChoice(Material.NETHER_STAR));
         Bukkit.addRecipe(recipe);

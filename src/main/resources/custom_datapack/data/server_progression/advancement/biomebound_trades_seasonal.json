@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_seasonal.title",
+      "fallback": "Книга по сезону"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_seasonal.description",
+      "fallback": "Купи у жителя зачарованную книгу, отмеченную как предложение текущего сезона."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

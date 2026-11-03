@@ -4,7 +4,6 @@ import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.UseCooldown;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,6 +15,7 @@ import org.bukkit.inventory.meta.CompassMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
+import org.example1.toolkit.Msg;
 
 import java.util.Set;
 import java.util.UUID;
@@ -91,8 +91,8 @@ public final class CompassTracker {
             }
             meta.getPersistentDataContainer().set(trackedKey, PersistentDataType.STRING, target.getUniqueId().toString());
             meta.displayName(Component.translatable("item.minecraft.compass")
-                    .color(NamedTextColor.AQUA)
-                    .append(Component.text(": " + target.getName(), NamedTextColor.AQUA)));
+                    .color(Msg.EMERALD)
+                    .append(Component.text(": " + target.getName(), Msg.EMERALD)));
             meta.lore(null);
         });
         refresh(item, holder);
@@ -114,10 +114,7 @@ public final class CompassTracker {
         }
 
         World anchor = anchorWorld(item);
-        boolean working = anchor != null
-                && holder.getWorld().getUID().equals(anchor.getUID())
-                && target != null && target.isOnline()
-                && target.getWorld().getUID().equals(anchor.getUID());
+        boolean working = isWorking(holder, target, anchor);
 
         if (working) {
             if (isLost(item)) {
@@ -136,21 +133,20 @@ public final class CompassTracker {
             saveLastKnown(item, target);
         }
 
+        Location desired = spinLodestone(target);
+        if (desired == null) desired = getLastKnown(item);
+        // Уже в нужном состоянии «потерян» — предмет не трогаем, иначе клиент получает пакет инвентаря каждую секунду.
+        if (isLost(item) && item.getItemMeta() instanceof CompassMeta current
+                && current.isLodestoneTracked() && current.hasLodestone() == (desired != null)) {
+            return;
+        }
+        final Location lodestone = desired;
         item.editMeta(CompassMeta.class, meta -> {
             meta.getPersistentDataContainer().set(lostKey, PersistentDataType.STRING, "1");
             meta.setLodestoneTracked(true);
+            if (lodestone != null) meta.setLodestone(lodestone);
+            else meta.clearLodestone();
         });
-        Location spin = spinLodestone(target);
-        if (spin != null) {
-            item.editMeta(CompassMeta.class, meta -> meta.setLodestone(spin));
-        } else {
-            Location lastKnown = getLastKnown(item);
-            if (lastKnown != null) {
-                item.editMeta(CompassMeta.class, meta -> meta.setLodestone(lastKnown));
-            } else {
-                item.editMeta(CompassMeta.class, CompassMeta::clearLodestone);
-            }
-        }
     }
 
     /** Полный сброс: компас снова обычный (отслеживание и магнит сняты). */
@@ -179,10 +175,7 @@ public final class CompassTracker {
         }
 
         World anchor = anchorWorld(item);
-        boolean working = anchor != null
-                && holder.getWorld().getUID().equals(anchor.getUID())
-                && target != null && target.isOnline()
-                && target.getWorld().getUID().equals(anchor.getUID());
+        boolean working = isWorking(holder, target, anchor);
 
         if (working) {
             Location loc = target.getLocation();
@@ -199,6 +192,14 @@ public final class CompassTracker {
             update(item, holder);
         }
         applyCooldownMarker(item);
+    }
+
+    /** Компас работает: игрок, цель и якорь в одном мире. */
+    private static boolean isWorking(Player holder, Player target, World anchor) {
+        return anchor != null
+                && holder.getWorld().getUID().equals(anchor.getUID())
+                && target != null && target.isOnline()
+                && target.getWorld().getUID().equals(anchor.getUID());
     }
 
     /**
@@ -228,18 +229,18 @@ public final class CompassTracker {
     /** Перезарядка у этого конкретного компаса (не у всех у игрока). */
     public static boolean isOnCooldown(ItemStack item) {
         if (item == null || item.getItemMeta() == null) return false;
-        Integer until = item.getItemMeta().getPersistentDataContainer().get(cooldownKey, PersistentDataType.INTEGER);
-        return until != null && Bukkit.getCurrentTick() < until;
+        Long until = item.getItemMeta().getPersistentDataContainer().get(cooldownKey, PersistentDataType.LONG);
+        return until != null && System.currentTimeMillis() < until;
     }
 
     /** Остаток перезарядки у этого компаса в секундах. */
     public static int cooldownSeconds(ItemStack item) {
         if (item == null || item.getItemMeta() == null) return 0;
-        Integer until = item.getItemMeta().getPersistentDataContainer().get(cooldownKey, PersistentDataType.INTEGER);
+        Long until = item.getItemMeta().getPersistentDataContainer().get(cooldownKey, PersistentDataType.LONG);
         if (until == null) return 0;
-        long remain = until - Bukkit.getCurrentTick();
+        long remain = until - System.currentTimeMillis();
         if (remain <= 0) return 0;
-        return (int) Math.ceil(remain / 20.0);
+        return (int) Math.ceil(remain / 1000.0);
     }
 
     /** Сохранить последнюю известную локацию цели в PDC компаса. */
@@ -331,8 +332,8 @@ public final class CompassTracker {
         float seconds = Config.COMPASS_COOLDOWN_TICKS / 20f;
         item.setData(DataComponentTypes.USE_COOLDOWN,
                 UseCooldown.useCooldown(seconds).cooldownGroup(COOLDOWN_GROUP).build());
-        item.editMeta(meta -> meta.getPersistentDataContainer().set(cooldownKey, PersistentDataType.INTEGER,
-                Bukkit.getCurrentTick() + Config.COMPASS_COOLDOWN_TICKS));
+        item.editMeta(meta -> meta.getPersistentDataContainer().set(cooldownKey, PersistentDataType.LONG,
+                System.currentTimeMillis() + Config.COMPASS_COOLDOWN_TICKS * 50L));
     }
 
     private static void removeCooldownMarker(ItemStack item) {

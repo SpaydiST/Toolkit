@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "server_progression.advancement.timespeed.title",
+      "fallback": "Ещё пять минут"
+    },
+    "description": {
+      "translate": "server_progression.advancement.timespeed.description",
+      "fallback": "Ляг в кровать ночью и проснись утром."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

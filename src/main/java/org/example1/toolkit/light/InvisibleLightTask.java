@@ -32,25 +32,25 @@ public final class InvisibleLightTask extends BukkitRunnable {
             }
 
             World world = player.getWorld();
-            String worldName = world.getName();
             double cx = player.getEyeLocation().getX();
             double cy = player.getEyeLocation().getY();
             double cz = player.getEyeLocation().getZ();
 
-            for (String key : InvisibleLightListener.LIGHT_BLOCKS) {
-                String[] p = key.split(":");
-                if (p.length != 4 || !p[0].equals(worldName)) continue;
-                try {
-                    int bx = Integer.parseInt(p[1]);
-                    int by = Integer.parseInt(p[2]);
-                    int bz = Integer.parseInt(p[3]);
-                    double dx = bx + 0.5 - cx;
-                    double dy = by + 0.5 - cy;
-                    double dz = bz + 0.5 - cz;
-                    if (dx * dx + dy * dy + dz * dz > RANGE_SQ) continue;
-                    world.spawnParticle(Particle.END_ROD, bx + 0.5, by + 0.5, bz + 0.5,
-                            3, 0.15, 0.15, 0.15, 0.01);
-                } catch (NumberFormatException ignored) {}
+            // Только блоки в ближайших чанках, а не все блоки сервера.
+            for (long packed : InvisibleLightListener.nearby(world, (int) Math.floor(cx), (int) Math.floor(cz), 1)) {
+                int bx = InvisibleLightListener.unpackX(packed);
+                int by = InvisibleLightListener.unpackY(packed);
+                int bz = InvisibleLightListener.unpackZ(packed);
+                double dx = bx + 0.5 - cx;
+                double dy = by + 0.5 - cy;
+                double dz = bz + 0.5 - cz;
+                if (dx * dx + dy * dy + dz * dz > RANGE_SQ) continue;
+                if (world.getBlockAt(bx, by, bz).getType() != Material.LIGHT) {
+                    InvisibleLightListener.forget(world, bx, by, bz);
+                    continue;
+                }
+                world.spawnParticle(Particle.END_ROD, bx + 0.5, by + 0.5, bz + 0.5,
+                        3, 0.15, 0.15, 0.15, 0.01);
             }
         }
     }

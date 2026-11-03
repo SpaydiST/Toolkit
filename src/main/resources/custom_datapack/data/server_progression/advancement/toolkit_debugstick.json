@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:stick"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_debugstick.title",
+      "fallback": "Всё под контролем"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_debugstick.description",
+      "fallback": "Измени свойство блока с помощью отладочной палочки."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

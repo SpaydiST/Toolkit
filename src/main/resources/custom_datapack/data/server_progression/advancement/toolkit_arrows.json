@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:tipped_arrow"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_arrows.title",
+      "fallback": "Рецепт на вынос"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_arrows.description",
+      "fallback": "Добавь зелье в котёл, затем используй на нём стрелы, чтобы пропитать их эффектом."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

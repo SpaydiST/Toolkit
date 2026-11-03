@@ -1,6 +1,7 @@
 package org.example1.toolkit.animal;
 
 import org.bukkit.GameRules;
+import org.bukkit.entity.Animals;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -8,6 +9,11 @@ import org.bukkit.event.entity.EntityBreedEvent;
 import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
+import org.bukkit.block.Block;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class AnimalSpawnerListener implements Listener {
 
@@ -24,9 +30,30 @@ public final class AnimalSpawnerListener implements Listener {
         var rules = AnimalSpawner.getSpawnRules();
         if (rules.isEmpty()) return;
 
+        var world = chunk.getWorld();
+        int animalsInChunk = 0;
+        for (var entity : chunk.getEntities()) {
+            if (entity instanceof Animals) animalsInChunk++;
+        }
+        int remainingSlots = AnimalSpawner.getMaxAnimalsPerChunk() - animalsInChunk;
+        if (remainingSlots <= 0) return;
+
+        count = Math.min(count, remainingSlots);
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         for (int i = 0; i < count; i++) {
-            var rule = rules.get(java.util.concurrent.ThreadLocalRandom.current().nextInt(rules.size()));
-            rule.trySpawn(chunk);
+            int x = (chunk.getX() << 4) + random.nextInt(16);
+            int z = (chunk.getZ() << 4) + random.nextInt(16);
+            Block ground = AnimalSpawnRule.findSpawnGround(world, x, z);
+            if (ground == null) continue;
+
+            List<AnimalSpawnRule> applicable = new ArrayList<>();
+            for (AnimalSpawnRule rule : rules) {
+                if (rule.matches(world, ground)) applicable.add(rule);
+            }
+            if (applicable.isEmpty()) continue;
+
+            AnimalSpawnRule rule = applicable.get(random.nextInt(applicable.size()));
+            rule.spawnAt(world, ground);
         }
     }
 

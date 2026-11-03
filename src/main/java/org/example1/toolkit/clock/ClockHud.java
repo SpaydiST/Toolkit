@@ -6,14 +6,26 @@ import org.bukkit.GameRules;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.example1.toolkit.ActionBarManager;
+import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
 import org.example1.toolkit.Msg;
+import org.example1.toolkit.progression.AchievementProgression;
+
+import java.util.Collections;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 public final class ClockHud {
+
+    private static final Set<Player> CLOCK_ACHIEVEMENT_SEEN = Collections.newSetFromMap(new WeakHashMap<>());
 
     private ClockHud() {}
 
     public static void render(Player p, ItemStack clock, TimeSpeedHook hook) {
+        if (CLOCK_ACHIEVEMENT_SEEN.add(p)) {
+            AchievementProgression.award(p, "toolkit_clock");
+        }
         World w = p.getWorld();
         long tick = w.getTime() % 24000;
         String time = formatTime(tick);
@@ -25,7 +37,7 @@ public final class ClockHud {
             msg = msg.append(Msg.sep())
                     .append(Msg.dim(skip));
         }
-        p.sendActionBar(msg);
+        ActionBarManager.show(p, "toolkit:clock", msg, Math.max(3, Config.HUD_INTERVAL_TICKS + 2), 20);
     }
 
     static String skipInfo(Player p, World w, long tick, TimeSpeedHook hook) {

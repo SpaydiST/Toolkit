@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:honey_bottle"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_honey.title",
+      "fallback": "Липкая экономика"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_honey.description",
+      "fallback": "Используй бутылочку мёда на котле, чтобы добавить мёд, или набери мёд из котла в бутылочку."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

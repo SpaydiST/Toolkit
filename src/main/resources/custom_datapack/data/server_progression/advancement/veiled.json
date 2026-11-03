@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:player_head"
+    },
+    "title": {
+      "translate": "server_progression.advancement.veiled.title",
+      "fallback": "Свой человек"
+    },
+    "description": {
+      "translate": "server_progression.advancement.veiled.description",
+      "fallback": "Надень голову моба или игрока, чтобы замаскироваться под её владельца."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

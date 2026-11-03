@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:enchanted_book"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_dual.title",
+      "fallback": "Два в одной обложке"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_dual.description",
+      "fallback": "Купи у жителя зачарованную книгу как минимум с двумя чарами и без проклятий."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
+import org.example1.toolkit.Lang;
+import org.example1.toolkit.Msg;
 
 import java.util.Map;
 import java.util.UUID;
@@ -65,24 +67,24 @@ public final class DeathCoords {
     public static void showLast(Player player) {
         DeathRecord r = LAST_DEATHS.get(player.getUniqueId());
         if (r == null) {
-            player.sendMessage(Component.text(Config.MSG_DEATH_NONE, NamedTextColor.GRAY));
+            player.sendMessage(Component.text(Config.MSG_DEATH_NONE, Msg.EMERALD));
             return;
         }
-        player.sendMessage(deathComponent(r.x(), r.y(), r.z(), r.dimension()));
+        player.sendMessage(deathComponent(player, r.x(), r.y(), r.z(), r.dimension()));
     }
 
     public static Component deathComponent(Player player) {
         Location loc = player.getLocation();
-        return deathComponent(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), dimensionPath(loc.getWorld()));
+        return deathComponent(player, loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), dimensionPath(loc.getWorld()));
     }
 
-    private static Component deathComponent(int x, int y, int z, String dimension) {
+    private static Component deathComponent(Player viewer, int x, int y, int z, String dimension) {
         String msg = String.format(Config.MSG_DEATH_COORDS, x, y, z, dimension);
         String coords = x + " " + y + " " + z;
-        return Component.text(msg, NamedTextColor.RED, TextDecoration.ITALIC)
+        return Component.text(msg, Config.COLOR_ERROR, TextDecoration.ITALIC)
                 .clickEvent(ClickEvent.copyToClipboard(coords))
                 .hoverEvent(HoverEvent.showText(
-                        Component.text("Нажми, чтобы скопировать координаты", NamedTextColor.GRAY)));
+                        Component.text(Lang.get(viewer, "death-copy-hint"), Msg.EMERALD)));
     }
 
     private static String dimensionPath(World world) {
@@ -96,6 +98,10 @@ public final class DeathCoords {
         };
     }
 
-    record DeathRecord(int x, int y, int z, String dimension) {
+    public static DeathRecord getRecord(UUID uuid) {
+        return LAST_DEATHS.get(uuid);
+    }
+
+    public record DeathRecord(int x, int y, int z, String dimension) {
     }
 }

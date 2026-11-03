@@ -10,6 +10,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
 import org.example1.toolkit.Msg;
+import org.example1.toolkit.progression.AchievementProgression;
 
 public final class FireElytraTask extends BukkitRunnable {
 
@@ -26,13 +27,15 @@ public final class FireElytraTask extends BukkitRunnable {
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (player.getFireTicks() <= 0) continue;
             if (!player.isGliding()) continue;
+            if (player.hasPotionEffect(org.bukkit.potion.PotionEffectType.FIRE_RESISTANCE)) continue;
 
             ItemStack chest = player.getInventory().getChestplate();
             if (chest == null || chest.getType() != Material.ELYTRA) continue;
 
+            AchievementProgression.award(player, "toolkit_fire");
             player.setGliding(false);
             Msg.of(player,
-                    Msg.prefix(Lang.get(player, "fire-elytra-prefix"), NamedTextColor.RED),
+                    Msg.prefix(Lang.get(player, "fire-elytra-prefix"), Config.COLOR_ERROR),
                     Msg.sep(),
                     Msg.action(Lang.get(player, "fire-elytra-blocked")));
         }

@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:clock"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_clock.title",
+      "fallback": "Почти вовремя"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_clock.description",
+      "fallback": "Возьми часы в любую руку, чтобы увидеть текущее время в строке действий."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

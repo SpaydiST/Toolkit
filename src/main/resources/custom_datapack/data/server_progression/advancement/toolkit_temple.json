@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:poisonous_potato"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_temple.title",
+      "fallback": "Осталась только табличка"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_temple.description",
+      "fallback": "Запусти ловушку с раздатчиком в храме в джунглях."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

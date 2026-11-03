@@ -5,3 +5,8 @@ build_test.log
 /libs/
 /org/
 /io/
+*.iml
+*.log
+.omc/
+run/
+*.args

@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:veiled",
+  "display": {
+    "icon": {
+      "id": "minecraft:zombie_head"
+    },
+    "title": {
+      "translate": "server_progression.advancement.veiled_mob.title",
+      "fallback": "Свой среди своих"
+    },
+    "description": {
+      "translate": "server_progression.advancement.veiled_mob.description",
+      "fallback": "Надень голову моба, чтобы замаскироваться под него."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

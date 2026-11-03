@@ -1,7 +1,6 @@
 package org.example1.toolkit.bannerhat;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 import io.papermc.paper.datacomponent.item.Equippable;
@@ -12,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.example1.toolkit.Msg;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -52,7 +52,7 @@ public final class BannerHatRecipe {
         ItemStack item = banner.clone();
         item.editMeta(meta -> {
             meta.getPersistentDataContainer().set(markerKey, PersistentDataType.STRING, "1");
-            meta.displayName(Component.text("Шлем-флаг", NamedTextColor.GOLD));
+            meta.displayName(Component.text("Шлем-флаг", Msg.EMERALD));
         });
         item.setData(DataComponentTypes.EQUIPPABLE, Equippable.equippable(EquipmentSlot.HEAD)
                 .swappable(false)

@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:elytra"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_fire.title",
+      "fallback": "Ветер в волосах"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_fire.description",
+      "fallback": "Начни планировать на элитрах, пока горишь и на тебе не действует огнестойкость."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

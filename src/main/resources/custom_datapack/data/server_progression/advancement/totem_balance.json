@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:totem_of_undying"
+    },
+    "title": {
+      "translate": "server_progression.advancement.totem_balance.title",
+      "fallback": "Отложенная встреча"
+    },
+    "description": {
+      "translate": "server_progression.advancement.totem_balance.description",
+      "fallback": "Переживи смертельный удар после срабатывания тотема бессмертия."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

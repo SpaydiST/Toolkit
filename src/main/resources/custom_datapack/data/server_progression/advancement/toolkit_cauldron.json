@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:cauldron"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_cauldron.title",
+      "fallback": "Экспериментальный суп"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_cauldron.description",
+      "fallback": "Используй наполненный водой котёл, чтобы сварить особое зелье или набрать его в стеклянную бутылочку."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

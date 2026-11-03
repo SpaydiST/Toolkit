@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.example1.toolkit.Config;
+import org.example1.toolkit.progression.AchievementProgression;
 
 public final class SnowGolemFreezeListener implements Listener {
 
@@ -25,6 +26,9 @@ public final class SnowGolemFreezeListener implements Listener {
         Entity hit = event.getHitEntity();
         if (hit instanceof LivingEntity living) {
             living.setFreezeTicks(living.getFreezeTicks() + FREEZE_TICKS);
+            if (living instanceof Player player) {
+                AchievementProgression.award(player, "toolkit_snowgolem");
+            }
         }
     }
 }

@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:book"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_profession.title",
+      "fallback": "Профориентация"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_profession.description",
+      "fallback": "Заверши сделку по предложению, скорректированному под профессию жителя."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

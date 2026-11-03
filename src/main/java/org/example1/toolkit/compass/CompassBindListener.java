@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 import org.example1.toolkit.Config;
 import org.example1.toolkit.Lang;
+import org.example1.toolkit.progression.AchievementProgression;
 
 import java.util.UUID;
 
@@ -29,13 +30,7 @@ public final class CompassBindListener implements Listener {
         if (block == null || block.getType() != Material.LODESTONE) return;
         ItemStack item = event.getItem();
         if (item == null || item.getType() != Material.COMPASS) return;
-        if (CompassTracker.isPlayerBound(item)) {
-            event.setCancelled(true);
-            CompassTracker.unbind(item);
-            CompassHud.hint(event.getPlayer(), Lang.get(event.getPlayer(), "unbound"));
-            return;
-        }
-        if (CompassTracker.isLodestoneBound(item)) {
+        if (CompassTracker.isPlayerBound(item) || CompassTracker.isLodestoneBound(item)) {
             event.setCancelled(true);
             CompassTracker.unbind(item);
             CompassHud.hint(event.getPlayer(), Lang.get(event.getPlayer(), "unbound"));
@@ -84,6 +79,9 @@ public final class CompassBindListener implements Listener {
             }
             CompassTracker.bind(held, player, target);
         }
+        if (CompassTracker.isPlayerBound(held)) {
+            AchievementProgression.award(player, "toolkit_compass");
+        }
     }
 
     @EventHandler
@@ -104,27 +102,26 @@ public final class CompassBindListener implements Listener {
     }
 
     @EventHandler
-    public void onRightClickAir(PlayerInteractEvent event) {
+    public void onRightClickCompass(PlayerInteractEvent event) {
         if (!Config.COMPASS_ENABLED) return;
-        if (event.getAction() != Action.RIGHT_CLICK_AIR) return;
+        Action action = event.getAction();
+        if (action != Action.RIGHT_CLICK_AIR) return;
         Player player = event.getPlayer();
-
-        ItemStack main = player.getInventory().getItemInMainHand();
-        ItemStack off = player.getInventory().getItemInOffHand();
-        ItemStack held = null;
-        if (main.getType() == Material.COMPASS) {
-            held = main;
-        } else if (off.getType() == Material.COMPASS) {
-            held = off;
-        }
-        if (held == null || !CompassTracker.isPlayerBound(held)) return;
+        ItemStack held = event.getHand() == EquipmentSlot.OFF_HAND
+                ? player.getInventory().getItemInOffHand()
+                : player.getInventory().getItemInMainHand();
+        if (held.getType() != Material.COMPASS) return;
+        boolean playerBound = CompassTracker.isPlayerBound(held);
+        boolean lodestoneBound = CompassTracker.isLodestoneBound(held);
+        if (!playerBound && !lodestoneBound) return;
 
         event.setCancelled(true);
         if (player.isSneaking()) {
             CompassTracker.unbind(held);
-            CompassHud.hint(player, Lang.get(player, "unbound"));
+            CompassHud.hint(player, Lang.get(player, playerBound ? "unbound" : "unbound-magnet"));
             return;
         }
+        if (!playerBound) return;
         if (CompassTracker.isOnCooldown(held)) return;
 
         UUID id = CompassTracker.trackedPlayer(held);

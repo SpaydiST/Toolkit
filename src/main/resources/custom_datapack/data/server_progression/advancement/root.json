@@ -1,0 +1,25 @@
+{
+  "display": {
+    "icon": {
+      "id": "minecraft:compass"
+    },
+    "title": {
+      "translate": "server_progression.advancement.root.title",
+      "fallback": "Это всё ещё ваниль?"
+    },
+    "description": {
+      "translate": "server_progression.advancement.root.description",
+      "fallback": "Войди в мир сервера, чтобы получить первое достижение."
+    },
+    "background": "minecraft:textures/block/deepslate_bricks.png",
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "entered_world": {
+      "trigger": "minecraft:tick"
+    }
+  }
+}

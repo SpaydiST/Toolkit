@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:white_banner"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_hat.title",
+      "fallback": "Головной флаг"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_hat.description",
+      "fallback": "Присядь и нажми правой кнопкой по воздуху со знаменем в руке, чтобы надеть его как шлем."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -10,11 +10,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
-    compileOnly("com.github.retrooper:packetevents-api:2.13.0")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.5-alpha")
     compileOnly(files("libs/LibsDisguises.jar"))
-    // Для AxiomChannelInjector: нетти есть в рантайме сервера, здесь только API.
-    compileOnly("io.netty:netty-handler:4.2.7.Final")
+    compileOnly(files("libs/PlaceholderAPI.jar"))
 }
 
 java {
@@ -26,7 +24,7 @@ tasks {
         // Configure the Minecraft version for our task.
         // This is the only required configuration besides applying the plugin.
         // Your plugin's jar (or shadowJar if present) will be used automatically.
-        minecraftVersion("26.2")
+        minecraftVersion("26.3")
         jvmArgs("-Xms2G", "-Xmx2G")
     }
 

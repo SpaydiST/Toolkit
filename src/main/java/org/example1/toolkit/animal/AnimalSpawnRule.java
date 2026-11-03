@@ -84,28 +84,39 @@ public record AnimalSpawnRule(
 
     public boolean trySpawn(Chunk chunk) {
         World world = chunk.getWorld();
-        if (!environments.contains(world.getEnvironment())) return false;
-
         ThreadLocalRandom r = ThreadLocalRandom.current();
         int x = (chunk.getX() << 4) + r.nextInt(16);
         int z = (chunk.getZ() << 4) + r.nextInt(16);
+        Block ground = findSpawnGround(world, x, z);
+        if (ground == null || !matches(world, ground)) return false;
+        return spawnAt(world, ground);
+    }
 
-        Block block = resolveGround(world.getHighestBlockAt(x, z));
-        if (block == null) return false;
-        if (!biomes.contains(block.getBiome())) return false;
-        if (!spawnsOnTopOf.isEmpty() && !spawnsOnTopOf.contains(block.getType())) return false;
+    public boolean matches(World world, Block ground) {
+        return environments.contains(world.getEnvironment())
+                && biomes.contains(ground.getBiome())
+                && (spawnsOnTopOf.isEmpty() || spawnsOnTopOf.contains(ground.getType()));
+    }
 
-        Block above = block.getRelative(0, 1, 0);
-        if (above.getLightFromSky() < 9) return false;
-        if (!Tag.REPLACEABLE.isTagged(above.getType())) return false;
+    public boolean spawnAt(World world, Block ground) {
+        ThreadLocalRandom r = ThreadLocalRandom.current();
 
         EntityType type = entityTypes.get(r.nextInt(entityTypes.size()));
-        Location loc = block.getLocation().add(0.5, 1, 0.5);
+        Location loc = ground.getLocation().add(0.5, 1, 0.5);
 
         var entity = world.spawnEntity(loc, type, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.CUSTOM);
         entity.addScoreboardTag(AnimalSpawner.MARKED_TAG);
-        entity.setPersistent(false);
+        // Keep custom-spawned animals saveable if players tame or equip them.
+        entity.setPersistent(true);
         return true;
+    }
+
+    public static Block findSpawnGround(World world, int x, int z) {
+        Block ground = resolveGround(world.getHighestBlockAt(x, z));
+        if (ground == null) return null;
+        Block above = ground.getRelative(0, 1, 0);
+        if (above.getLightFromSky() < 9 || !Tag.REPLACEABLE.isTagged(above.getType())) return null;
+        return ground;
     }
 
     private static Block resolveGround(Block start) {

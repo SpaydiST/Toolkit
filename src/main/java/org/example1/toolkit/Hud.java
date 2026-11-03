@@ -1,7 +1,5 @@
 package org.example1.toolkit;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -15,6 +13,7 @@ public final class Hud {
 
     private final JavaPlugin plugin;
     private final TimeSpeedHook hook;
+    private org.bukkit.scheduler.BukkitTask task;
 
     public Hud(JavaPlugin plugin, TimeSpeedHook hook) {
         this.plugin = plugin;
@@ -22,12 +21,17 @@ public final class Hud {
     }
 
     public void start() {
-        plugin.getServer().getScheduler().runTaskTimer(plugin, this::tick, 5L, Config.HUD_INTERVAL_TICKS);
+        stop();
+        task = plugin.getServer().getScheduler().runTaskTimer(plugin, this::tick, 5L, Config.HUD_INTERVAL_TICKS);
+    }
+
+    public void stop() {
+        if (task != null) task.cancel();
+        task = null;
     }
 
     private void tick() {
         if (!Config.COMPASS_ENABLED && !Config.CLOCK_ENABLED) return;
-        if (FlectonePulseCompat.isAvailable() && Config.FLECTONEPULSE_COMPAT) return;
         for (Player p : Bukkit.getOnlinePlayers()) {
             if (p.isDead() || !p.isOnline()) continue;
             if (p.isSleeping()) continue;

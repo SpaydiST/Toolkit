@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:white_banner"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit.title",
+      "fallback": "Чемодан с секретами"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit.description",
+      "fallback": "Получи любое достижение в этой ветке."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:light"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_light.title",
+      "fallback": "Невидимая лампочка"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_light.description",
+      "fallback": "Создай невидимый свет из четырёх единиц светокаменной пыли и стекла, затем размести его."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

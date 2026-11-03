@@ -18,7 +18,7 @@ import org.example1.toolkit.nms.Nms;
 
 public final class ParrotTransplantListener implements Listener {
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (!Config.PARROT_TRANSPLANT_ENABLED) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -50,6 +50,9 @@ public final class ParrotTransplantListener implements Listener {
         } else {
             parrot.setVariant(Parrot.Variant.RED);
         }
-        parrot.setPersistent(false);
+        parrot.setPersistent(true);
+        parrot.setTamed(true);
+        parrot.setOwner(player);
+        parrot.setSitting(true);
     }
 }

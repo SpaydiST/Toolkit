@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:bundle"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_bundle.title",
+      "fallback": "Пропажа в пути"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_bundle.description",
+      "fallback": "Зачаруй мешочек любого цвета «Проклятием утраты» на наковальне и забери результат."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

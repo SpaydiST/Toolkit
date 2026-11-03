@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:item_frame"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_frame.title",
+      "fallback": "Искусство невидимого"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_frame.description",
+      "fallback": "Соедини рамку с мембраной фантома, чтобы получить невидимую, затем размести её."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

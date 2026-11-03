@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_reputation.title",
+      "fallback": "Постоянный клиент"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_reputation.description",
+      "fallback": "Открой торговлю с жителем после того, как репутация в деревне дала скидку на книгу."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

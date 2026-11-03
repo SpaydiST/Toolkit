@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:water_bucket"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_wash.title",
+      "fallback": "Стираем следы"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_wash.description",
+      "fallback": "Используй водяной котёл: добавь или нанеси краситель, очисти кожаную броню, знамя, шалкер или поддерживаемый цветной блок либо нанеси зелье из котла на броню."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

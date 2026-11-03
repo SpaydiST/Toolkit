@@ -1,7 +1,6 @@
 package org.example1.toolkit.light;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -11,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.example1.toolkit.Config;
+import org.example1.toolkit.Msg;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.CustomModelData;
 
@@ -33,7 +33,7 @@ public final class InvisibleLightRecipe {
         markerKey = new NamespacedKey(plugin, MARKER);
         levelKey = new NamespacedKey(plugin, LEVEL_KEY);
 
-        ShapelessRecipe recipe = new ShapelessRecipe(recipeKey, createResult(Config.INVISIBLE_LIGHT_DEFAULT_LEVEL, 4));
+        ShapelessRecipe recipe = new ShapelessRecipe(recipeKey, createResult(Config.INVISIBLE_LIGHT_DEFAULT_LEVEL, 2));
         recipe.addIngredient(4, Material.GLOWSTONE_DUST);
         recipe.addIngredient(Material.GLASS);
         Bukkit.addRecipe(recipe);
@@ -82,7 +82,7 @@ public final class InvisibleLightRecipe {
     }
 
     private static Component buildDisplayName(int level) {
-        return                 Component.text("Невидимый свет", NamedTextColor.YELLOW)
-                .append(Component.text(" [" + level + "]", NamedTextColor.GRAY));
+        return Component.text("Невидимый свет", Msg.EMERALD)
+                .append(Component.text(" [" + level + "]", Msg.EMERALD));
     }
 }

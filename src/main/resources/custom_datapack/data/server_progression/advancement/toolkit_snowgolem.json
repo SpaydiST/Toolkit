@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:snowball"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_snowgolem.title",
+      "fallback": "Ледяной приём"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_snowgolem.description",
+      "fallback": "Получи попадание снежком, который бросил снежный голем."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

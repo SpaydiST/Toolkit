@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:compass"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_compass.title",
+      "fallback": "Дружба на расстоянии"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_compass.description",
+      "fallback": "Привяжи компас к магниту, затем нажми им правой кнопкой по другому игроку, чтобы отслеживать его."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_offer.title",
+      "fallback": "После восьмой покупки"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_offer.description",
+      "fallback": "Поторгуй с одним жителем нужное число раз, затем открой его предложения, пока действует скидка на особую книгу."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

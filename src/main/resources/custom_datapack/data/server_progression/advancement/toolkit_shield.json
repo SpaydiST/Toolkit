@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:shield"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_shield.title",
+      "fallback": "Щитовая дипломатия"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_shield.description",
+      "fallback": "В бою сработай «Шипами» или «Отбрасыванием» на щите либо заблокируй удар топора щитом с «Быстрой перезарядкой»."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

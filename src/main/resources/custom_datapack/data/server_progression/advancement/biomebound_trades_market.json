@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_market.title",
+      "fallback": "Спрос рождает цену"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_market.description",
+      "fallback": "Купи книгу с чарами, на которые уже вырос спрос на местном рынке: повторные покупки повышают их цену."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

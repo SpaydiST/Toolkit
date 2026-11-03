@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:biomebound_trades",
+  "display": {
+    "icon": {
+      "id": "minecraft:emerald"
+    },
+    "title": {
+      "translate": "server_progression.advancement.biomebound_trades_sale.title",
+      "fallback": "Только сегодня"
+    },
+    "description": {
+      "translate": "server_progression.advancement.biomebound_trades_sale.description",
+      "fallback": "Открой торговлю с жителем во время ежедневной распродажи, когда на книгу действует скидка."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

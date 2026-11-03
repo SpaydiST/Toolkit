@@ -1,21 +1,23 @@
 name: Toolkit
 version: '1-0'
 main: org.example1.toolkit.Toolkit
-api-version: '26.2'
+bootstrapper: org.example1.toolkit.AchievementBootstrap
+api-version: '26.3'
 load: POSTWORLD
 dependencies:
   server:
     TimeSpeed-plugin:
       load: AFTER
       required: false
-    packetevents:
+    CoordinateOffset:
       load: BEFORE
       required: false
     LibsDisguises:
       required: false
-    FlectonePulse:
-      load: AFTER
+    PlaceholderAPI:
+      load: BEFORE
       required: false
+      join-classpath: true
 defaultPerm: op
 permissions:
   toolkit.reload:

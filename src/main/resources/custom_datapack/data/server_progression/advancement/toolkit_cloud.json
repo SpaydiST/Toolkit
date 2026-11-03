@@ -1,0 +1,25 @@
+{
+  "parent": "server_progression:toolkit",
+  "display": {
+    "icon": {
+      "id": "minecraft:tipped_arrow"
+    },
+    "title": {
+      "translate": "server_progression.advancement.toolkit_cloud.title",
+      "fallback": "Дымовая завеса"
+    },
+    "description": {
+      "translate": "server_progression.advancement.toolkit_cloud.description",
+      "fallback": "Попади в блок стрелой с эффектом зелья, чтобы создать облако эффекта."
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "complete": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}
